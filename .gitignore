@@ -1,0 +1,13 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# No secrets or machine-local state in this repo
+# (the install scripts write to ~/.config/opencode/ which is outside the repo)
