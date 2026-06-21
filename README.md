@@ -38,7 +38,7 @@ becomes the command's prompt.
   blocks mutations at the tool level, not just by prompt instruction.
 - **Reference docs load via `@`-includes.** Command bodies use
   `@{{MAGIC_PI_HOME}}/references/<file>.md` to pull in technique guides and
-  subagent prompt templates. The placeholder is resolved to an absolute path
+  subagent prompt templates. The token is resolved to an absolute path
   at install time.
 - **No runtime dependencies.** Everything is static markdown. Nothing is
   downloaded from the internet.
@@ -209,7 +209,7 @@ implementation.
 4. Propose 2-3 approaches with trade-offs.
 5. Present the design in sections, getting approval after each.
 6. Write the spec to `./.magic-pi/specs/<uuid>.md`.
-7. Spec self-review (placeholders, consistency, scope, ambiguity).
+7. Spec self-review (unfilled tokens, consistency, scope, ambiguity).
 8. User reviews the spec.
 9. Write the implementation plan to `./.magic-pi/plans/<uuid>.md`.
 10. Plan self-review.
