@@ -185,7 +185,7 @@ For a single specific bug, use `/magic-debug` instead.
 **Tools & access:** Read-only — `read`, `bash`, `grep`, `glob`, `agent`. No
 `edit` or `write` tools are available.
 
-**Example:**
+**Examples:**
 
 ```text
 /magic-review src/services/payment/
@@ -220,9 +220,12 @@ implementation.
 is presented AND approved. This applies to every request regardless of
 perceived simplicity.
 
-**Tools & access:** Read-only on the codebase. Writable ONLY on
-`./.magic-pi/specs/` and `./.magic-pi/plans/`. Bash is read-only — no
-filesystem mutation, no package installs, no commits.
+**Tools & access:** Full tool access in frontmatter (`read`, `write`, `edit`,
+`bash`, `grep`, `glob`, `agent`). The command's prompt enforces read-only
+behavior on the codebase — it may ONLY use `write`/`edit` on spec and plan
+documents under `./.magic-pi/specs/` and `./.magic-pi/plans/`. Unlike
+`magic-ask`, `magic-review`, and `magic-orchestrator` (where read-only access
+is enforced at the tool level), this is a prompt-level constraint.
 
 **Example:**
 
@@ -313,7 +316,7 @@ bugs go to `/magic-debug`; architecture findings needing design go to
 
 ## Repo structure
 
-```
+```text
 magic-pi-opencode/
 ├── install.ps1                          # Windows installer
 ├── install.sh                           # Unix installer
