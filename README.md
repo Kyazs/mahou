@@ -1,21 +1,23 @@
 # magic-pi-opencode
 
-A portable, shareable set of opencode agents ported from the
+A portable, shareable set of opencode commands ported from the
 [magic-pi](https://github.com/) pi agent configuration. Brings magic-pi's
 switchable agent modes (ask, debug, review, brainstorm, orchestrator) into
-opencode as standalone agents you can switch to with `/agent`.
+opencode as slash commands you run like `/magic-debug`, `/magic-review`, etc.
 
 ## What's included
 
-Five agents that opencode doesn't ship built-in:
+Five commands that opencode doesn't ship built-in:
 
-| Agent | Purpose | Access |
+| Command | Purpose | Access |
 |---|---|---|
-| `magic-ask` | Answer questions / explain code without changes | read-only |
-| `magic-debug` | Systematic root-cause debugging (4 phases) | full |
-| `magic-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
-| `magic-brainstorm` | Design to spec to implementation plan flow | spec/plan writable only |
-| `magic-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
+| `/magic-ask` | Answer questions / explain code without changes | read-only |
+| `/magic-debug` | Systematic root-cause debugging (4 phases) | full |
+| `/magic-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
+| `/magic-brainstorm` | Design to spec to implementation plan flow | spec/plan writable only |
+| `/magic-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
+
+Plus `/magic` which lists all available commands.
 
 opencode's built-in `plan` and `build` agents already cover those workflows, so
 they are not duplicated here.
@@ -37,12 +39,12 @@ chmod +x install.sh
 ./install.sh
 ```
 
-**After install, restart opencode** for the new agents to appear in `/agent`.
+**After install, restart opencode** for the new commands to appear.
 
 ### What the installer does
 
 1. Copies `references/` to `~/.config/opencode/magic-pi/references/`
-2. Copies `agents/*.md` to `~/.config/opencode/agents/`, replacing
+2. Copies `commands/*.md` to `~/.config/opencode/command/`, replacing
    `{{MAGIC_PI_HOME}}` with the resolved absolute path (for `@`-include
    compatibility)
 
@@ -59,57 +61,62 @@ Nothing is downloaded from the internet. No dependencies required.
 
 ## Usage
 
-Switch to an agent with opencode's `/agent` command:
+Run a command with opencode's slash command interface:
 
 ```
-/agent magic-debug
-/agent magic-review
-/agent magic-brainstorm
-/agent magic-orchestrator
-/agent magic-ask
+/magic                      # list all magic-pi commands
+/magic-debug                # systematic debugging
+/magic-review               # code review
+/magic-brainstorm           # design to spec to plan
+/magic-orchestrator         # execute a plan via subagents
+/magic-ask                  # explain code
 ```
 
-Or start opencode with a specific agent:
+Pass arguments after the command:
 
-```bash
-opencode --agent magic-debug
+```
+/magic-debug The auth tests are failing intermittently after the refactor
+/magic-review src/services/payment/
+/magic-brainstorm I want to add a webhook system for real-time notifications
+/magic-orchestrator ./.magic-pi/plans/abc123.md
+/magic-ask How does the retry logic in the HTTP client work?
 ```
 
 ### Workflows
 
 **Debug a bug:**
 ```
-/agent magic-debug
-The auth tests are failing intermittently after the refactor
+/magic-debug The auth tests are failing intermittently after the refactor
 ```
+Runs the 4-phase systematic debugging process: root cause investigation,
+pattern analysis, hypothesis testing, implementation + hardening.
 
 **Review a module:**
 ```
-/agent magic-review
-Review the payment service in src/services/payment/
+/magic-review Review the payment service in src/services/payment/
 ```
+Runs the 4-phase code review: discovery, triage, verification (one subagent per
+issue), final report. Only confirmed issues reach the report.
 
 **Design a feature:**
 ```
-/agent magic-brainstorm
-I want to add a webhook system for real-time notifications
+/magic-brainstorm I want to add a webhook system for real-time notifications
 ```
-(Produces spec + plan files under `./.magic-pi/`, then tells you to switch to
-build or orchestrator.)
+Design to spec to plan flow. Produces spec + plan files under `./.magic-pi/`,
+then tells you to run `/magic-orchestrator` to execute.
 
 **Execute a plan:**
 ```
-/agent magic-orchestrator
-Execute the plan at ./.magic-pi/plans/<uuid>.md
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md
 ```
-(Dispatches implementer subagents per task with spec + code quality review
-after each.)
+Dispatches implementer subagents per task with spec compliance + code quality
+review after each task.
 
 **Ask a question:**
 ```
-/agent magic-ask
-How does the retry logic in the HTTP client work?
+/magic-ask How does the retry logic in the HTTP client work?
 ```
+Reads code and explains. No changes made.
 
 ## Repo structure
 
@@ -117,13 +124,14 @@ How does the retry logic in the HTTP client work?
 magic-pi-opencode/
 ├── install.ps1              # Windows installer
 ├── install.sh               # Unix installer
-├── agents/                  # 5 agent definitions (templates with {{MAGIC_PI_HOME}})
-│   ├── magic-ask.md
-│   ├── magic-debug.md
-│   ├── magic-review.md
-│   ├── magic-brainstorm.md
-│   └── magic-orchestrator.md
-├── references/              # supporting docs loaded by agents via @-includes
+├── commands/                # 6 slash command definitions (templates with {{MAGIC_PI_HOME}})
+│   ├── magic.md             # /magic — lists all commands
+│   ├── magic-ask.md         # /magic-ask
+│   ├── magic-debug.md       # /magic-debug
+│   ├── magic-review.md      # /magic-review
+│   ├── magic-brainstorm.md  # /magic-brainstorm
+│   └── magic-orchestrator.md # /magic-orchestrator
+├── references/              # supporting docs loaded by commands via @-includes
 │   ├── root-cause-tracing.md
 │   ├── defense-in-depth.md
 │   ├── condition-based-waiting.md
@@ -136,19 +144,31 @@ magic-pi-opencode/
 └── README.md
 ```
 
+## How it works
+
+Commands are opencode's slash command system (same as GSD's `/gsd-*` commands).
+Each command file in `commands/` has frontmatter with `description`, `tools`,
+and `argument-hint`, plus a body that becomes the command's prompt. Commands
+`@`-include reference files for supporting techniques and subagent prompt
+templates.
+
+Read-only commands (`magic-ask`, `magic-review`, `magic-orchestrator`) simply
+don't declare `write`/`edit` in their `tools:` frontmatter -- opencode enforces
+this at the tool level, not just by prompt instruction.
+
 ## How it maps from magic-pi
 
 magic-pi is a [pi](https://github.com/earendil-works/pi-coding-agent) agent
 config with switchable modes. This repo ports the mode content to opencode's
-agent format:
+command format:
 
-| magic-pi mode | opencode agent | Key adaptations |
+| magic-pi mode | opencode command | Key adaptations |
 |---|---|---|
-| `modes/ask.md` | `magic-ask.md` | `permission: { edit: deny }` enforces read-only |
-| `modes/debug.md` | `magic-debug.md` | `@`-includes for technique docs; explore subagents replace pi's Explore + context-mode |
-| `modes/review.md` | `magic-review.md` | `@`-include for verifier template; general subagents replace pi's general-purpose |
-| `modes/brainstorm.md` | `magic-brainstorm.md` | `@`-include for writing skill; specs/plans to `./.magic-pi/` |
-| `modes/orchestrator.md` | `magic-orchestrator.md` | References prompt templates; delegates to general subagents |
+| `modes/ask.md` | `commands/magic-ask.md` | `tools:` frontmatter enforces read-only (no edit/write) |
+| `modes/debug.md` | `commands/magic-debug.md` | `@`-includes for technique docs; explore subagents replace pi's Explore + context-mode |
+| `modes/review.md` | `commands/magic-review.md` | `@`-include for verifier template; general subagents replace pi's general-purpose |
+| `modes/brainstorm.md` | `commands/magic-brainstorm.md` | `@`-include for writing skill; specs/plans to `./.magic-pi/` |
+| `modes/orchestrator.md` | `commands/magic-orchestrator.md` | References prompt templates; delegates to general subagents |
 
 ### Adaptations from pi to opencode
 
@@ -158,9 +178,9 @@ agent format:
 - `subagent_type: "Explore"` -> `subagent_type: "explore"`
 - `subagent_type: "general-purpose"` -> `subagent_type: "general"`
 - context-mode tools (`ctx_execute_file`, etc.) -> removed; use `read`/`grep`/`bash` + `task` subagents
-- `/mode X` -> `/agent magic-X`
-- `disabled-tools: edit, write` -> `permission: { edit: deny }` (enforced, not just prompted)
-- `thinking: high` -> dropped (opencode uses model variants, not agent-level thinking)
+- `/mode X` -> `/magic-X` (slash commands instead of mode switching)
+- `disabled-tools: edit, write` -> `tools:` frontmatter (enforced by opencode)
+- `thinking: high` -> dropped (opencode uses model variants, not command-level thinking)
 
 ## Requirements
 

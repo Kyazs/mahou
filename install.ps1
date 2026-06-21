@@ -1,14 +1,14 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Install magic-pi-opencode agents into opencode's global config.
+    Install magic-pi-opencode commands into opencode's global config.
 .DESCRIPTION
-    Copies agent files to ~/.config/opencode/agents/ and reference files to
+    Copies command files to ~/.config/opencode/command/ and reference files to
     ~/.config/opencode/magic-pi/references/. Replaces {{MAGIC_PI_HOME}} in
-    agent files with the resolved absolute path (forward slashes for @-include
+    command files with the resolved absolute path (forward slashes for @-include
     compatibility).
 .PARAMETER Uninstall
-    Remove magic-pi-opencode agents and references.
+    Remove magic-pi-opencode commands and references.
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -Uninstall
@@ -20,15 +20,16 @@ param(
 $ErrorActionPreference = "Stop"
 
 $ConfigDir = Join-Path $env:USERPROFILE ".config\opencode"
-$AgentsDir = Join-Path $ConfigDir "agents"
+$CommandDir = Join-Path $ConfigDir "command"
 $MagicPiDir = Join-Path $ConfigDir "magic-pi"
 $RefsDir = Join-Path $MagicPiDir "references"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$SourceAgents = Join-Path $ScriptDir "agents"
+$SourceCommands = Join-Path $ScriptDir "commands"
 $SourceRefs = Join-Path $ScriptDir "references"
 
-$AgentFiles = @(
+$CommandFiles = @(
+    "magic.md",
     "magic-ask.md",
     "magic-debug.md",
     "magic-review.md",
@@ -42,11 +43,11 @@ $MagicPiHome = ($MagicPiDir -replace '\\', '/')
 if ($Uninstall) {
     Write-Host "Uninstalling magic-pi-opencode..." -ForegroundColor Yellow
 
-    foreach ($f in $AgentFiles) {
-        $target = Join-Path $AgentsDir $f
+    foreach ($f in $CommandFiles) {
+        $target = Join-Path $CommandDir $f
         if (Test-Path $target) {
             Remove-Item $target -Force
-            Write-Host "  Removed agent: $f"
+            Write-Host "  Removed command: $f"
         }
     }
 
@@ -73,7 +74,7 @@ if ($Uninstall) {
 Write-Host "Installing magic-pi-opencode..." -ForegroundColor Cyan
 
 # Create directories
-foreach ($d in @($ConfigDir, $AgentsDir, $MagicPiDir, $RefsDir)) {
+foreach ($d in @($ConfigDir, $CommandDir, $MagicPiDir, $RefsDir)) {
     if (-not (Test-Path $d)) {
         New-Item -ItemType Directory -Path $d -Force | Out-Null
     }
@@ -85,11 +86,11 @@ Copy-Item -Path (Join-Path $SourceRefs "*") -Destination $RefsDir -Recurse -Forc
 $refCount = (Get-ChildItem $RefsDir -Recurse -File).Count
 Write-Host "    $refCount reference files installed to $RefsDir"
 
-# Copy agents with {{MAGIC_PI_HOME}} replacement
-Write-Host "  Installing agents..."
-foreach ($f in $AgentFiles) {
-    $src = Join-Path $SourceAgents $f
-    $dst = Join-Path $AgentsDir $f
+# Copy commands with {{MAGIC_PI_HOME}} replacement
+Write-Host "  Installing commands..."
+foreach ($f in $CommandFiles) {
+    $src = Join-Path $SourceCommands $f
+    $dst = Join-Path $CommandDir $f
 
     if (-not (Test-Path $src)) {
         Write-Host "    SKIP (not found): $f" -ForegroundColor Red
@@ -104,7 +105,7 @@ foreach ($f in $AgentFiles) {
 
 Write-Host ""
 Write-Host "Install complete." -ForegroundColor Green
-Write-Host "  Agents:    $AgentsDir" -ForegroundColor Gray
+Write-Host "  Commands:   $CommandDir" -ForegroundColor Gray
 Write-Host "  References: $RefsDir" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Restart opencode for the new agents to appear in /agent." -ForegroundColor Yellow
+Write-Host "Restart opencode for the new commands to appear." -ForegroundColor Yellow

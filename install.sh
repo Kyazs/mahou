@@ -2,24 +2,25 @@
 set -euo pipefail
 
 #
-# Install magic-pi-opencode agents into opencode's global config.
-# Copies agent files to ~/.config/opencode/agents/ and reference files to
+# Install magic-pi-opencode commands into opencode's global config.
+# Copies command files to ~/.config/opencode/command/ and reference files to
 # ~/.config/opencode/magic-pi/references/. Replaces {{MAGIC_PI_HOME}} in
-# agent files with the resolved absolute path.
+# command files with the resolved absolute path.
 #
 # Usage: ./install.sh [--uninstall]
 #
 
 CONFIG_DIR="${HOME}/.config/opencode"
-AGENTS_DIR="${CONFIG_DIR}/agents"
+COMMAND_DIR="${CONFIG_DIR}/command"
 MAGIC_PI_DIR="${CONFIG_DIR}/magic-pi"
 REFS_DIR="${MAGIC_PI_DIR}/references"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SOURCE_AGENTS="${SCRIPT_DIR}/agents"
+SOURCE_COMMANDS="${SCRIPT_DIR}/commands"
 SOURCE_REFS="${SCRIPT_DIR}/references"
 
-AGENT_FILES=(
+COMMAND_FILES=(
+    "magic.md"
     "magic-ask.md"
     "magic-debug.md"
     "magic-review.md"
@@ -35,11 +36,11 @@ fi
 if $UNINSTALL; then
     echo "Uninstalling magic-pi-opencode..."
 
-    for f in "${AGENT_FILES[@]}"; do
-        target="${AGENTS_DIR}/${f}"
+    for f in "${COMMAND_FILES[@]}"; do
+        target="${COMMAND_DIR}/${f}"
         if [[ -f "$target" ]]; then
             rm -f "$target"
-            echo "  Removed agent: $f"
+            echo "  Removed command: $f"
         fi
     done
 
@@ -64,17 +65,17 @@ fi
 
 echo "Installing magic-pi-opencode..."
 
-mkdir -p "$AGENTS_DIR" "$REFS_DIR"
+mkdir -p "$COMMAND_DIR" "$REFS_DIR"
 
 echo "  Copying reference files..."
 cp -r "${SOURCE_REFS}/." "$REFS_DIR/"
 ref_count=$(find "$REFS_DIR" -type f | wc -l | tr -d ' ')
 echo "    $ref_count reference files installed to $REFS_DIR"
 
-echo "  Installing agents..."
-for f in "${AGENT_FILES[@]}"; do
-    src="${SOURCE_AGENTS}/${f}"
-    dst="${AGENTS_DIR}/${f}"
+echo "  Installing commands..."
+for f in "${COMMAND_FILES[@]}"; do
+    src="${SOURCE_COMMANDS}/${f}"
+    dst="${COMMAND_DIR}/${f}"
 
     if [[ ! -f "$src" ]]; then
         echo "    SKIP (not found): $f"
@@ -87,7 +88,7 @@ done
 
 echo ""
 echo "Install complete."
-echo "  Agents:     ${AGENTS_DIR}"
+echo "  Commands:   ${COMMAND_DIR}"
 echo "  References: ${REFS_DIR}"
 echo ""
-echo "Restart opencode for the new agents to appear in /agent."
+echo "Restart opencode for the new commands to appear."
