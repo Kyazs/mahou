@@ -42,39 +42,92 @@ User's idea: $ARGUMENTS
 <checklist>
 Complete in order:
 
-1. **Explore project context** -- read relevant files, docs, and recent commits
-   (`git log --oneline -20`, `git diff`). Understand the architecture before
-   asking anything.
+1. **Explore project context**:
+   a. Read `./.magic-pi/PROJECT.md` (project goal, tech stack, conventions,
+      decisions) — if it doesn't exist, tell the user to run
+      /magic-new-project first (or proceed in feature-at-a-time mode for a
+      one-off feature).
+   b. Read `./.magic-pi/ROADMAP.md` (which feature is this, what depends on
+      it, what features are already done).
+   c. Read specs of completed/prior features that this one depends on (from
+      ROADMAP dependency list).
+   d. Read `./.magic-pi/research/*.md` briefs relevant to this feature.
+   e. Read `./.magic-pi/map.md` if it exists (codebase memory).
+   f. Read relevant files, docs, and recent commits (`git log --oneline -20`,
+      `git diff`). Understand the architecture before asking anything.
+
+1a. **UI detection** — if the feature involves a user interface:
+    @{{MAGIC_PI_HOME}}/references/ui-design.md
+    Add UI discovery questions to step 3:
+      - Purpose & context (who specifically, state of mind, success criteria)
+      - Content & data (realistic ranges: min/typical/max, edge cases)
+      - Design direction (color strategy, theme scene sentence, anchor
+        references, register: brand vs product)
+      - Anti-goals (what NOT to be)
+    In step 5, enumerate key states (default, empty, loading, error, success,
+    edge cases).
+    In step 5, run AI slop test against any visual direction proposed.
+    If no UI: skip entirely, zero token cost.
+
 2. **Scope check** -- if the request describes multiple independent subsystems,
    flag it immediately. Help the user decompose into sub-projects and brainstorm
    the first one. Each sub-project gets its own spec -> plan cycle.
+
 3. **Ask clarifying questions** -- ONE at a time. Prefer multiple choice. Focus
    on purpose, constraints, and success criteria.
+
 4. **Propose 2-3 approaches** -- with trade-offs. Lead with your recommendation.
+
 5. **Present the design** -- in sections scaled to complexity. Ask after each
    section whether it looks right. Cover: architecture, components, data flow,
    error handling, testing.
+
 6. **Write the spec** -- once approved, generate a UUID (use
    `[guid]::NewGuid().ToString()` in PowerShell, or
    `python -c "import uuid; print(uuid.uuid4())"`, or `uuidgen` if available)
    and write the spec to `./.magic-pi/specs/<uuid>.md`. Announce the path.
    Include: goal, context, design, components, data flow, error handling,
    testing approach, out-of-scope.
+   **Adaptive depth:** When the request is clear and context pins
+   scope/direction, use compact spec form (3-5 bullets). When ambiguous or
+   multi-screen, use the full structured form. Don't pad a clear spec to
+   look thorough.
+
 7. **Spec self-review** -- re-read with fresh eyes: placeholder scan, internal
    consistency, scope check, ambiguity check. Fix inline.
+
 8. **User reviews spec** -- ask the user to review. If they request changes,
    make them and re-run step 7. Only proceed once approved.
+
 9. **Write the implementation plan** -- read the writing reference below and
    follow it. Write the plan to `./.magic-pi/plans/<uuid>.md` (same UUID).
    Announce the path.
+
 10. **Plan self-review** -- run the self-review from the writing reference.
     Optionally dispatch a plan-reviewer subagent using the prompt in the
     writing reference.
+
 11. **User reviews plan** -- ask the user to review. If they request changes,
     make them and re-review. Only proceed once approved.
-12. **Transition** -- tell the user to run `/magic-orchestrator` to execute the
+
+12. **Update ROADMAP** -- update `./.magic-pi/ROADMAP.md`: set this feature's
+    status to `planned`, fill in the spec and plan paths.
+
+13. **Transition** -- tell the user to run `/magic-orchestrator` to execute the
     plan via subagents, or use the build agent to implement directly.
 </checklist>
+
+<replan_support>
+If returning from /magic-verify with a REPLAN verdict:
+- Read the existing spec (including any revision log).
+- Read the verify report (what failed and why).
+- Append to the spec's revision log (round N+1). Do NOT overwrite round N.
+  The revision log section tracks what changed and why across replan rounds.
+- Revise only the affected sections, not the entire spec.
+- Update ROADMAP.md: feature status → `replanned`, increment revision count.
+- Then proceed through the normal checklist from step 9 (write new/amended
+  plan) onward.
+</replan_support>
 
 <principles>
 - **One question at a time** -- don't overwhelm.
