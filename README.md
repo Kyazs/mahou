@@ -84,11 +84,17 @@ chmod +x install.sh
 | Command | Purpose | Access |
 |---|---|---|
 | `/magic` | List all magic-pi commands | read-only |
+| `/magic-new-project` | Initialize project — PROJECT.md + ROADMAP.md | full (.magic-pi/ only) |
+| `/magic-init` | Generate codebase map for existing projects | full (.magic-pi/ only) |
+| `/magic-research` | Internet research — explore, diagnose, or lookup | full (webfetch) |
 | `/magic-ask` | Answer questions / explain code without changes | read-only |
 | `/magic-debug` | Systematic root-cause debugging (4 phases) | full |
 | `/magic-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
 | `/magic-brainstorm` | Design to spec to implementation plan | spec/plan writable |
 | `/magic-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
+| `/magic-verify` | Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN | read-only |
+| `/magic-resume` | Resume work from previous session with reconciliation | read-only |
+| `/magic-ship` | Push branch, create PR, filter .magic-pi/ artifacts | read-only + bash |
 
 Detailed coverage of each command is in the next section.
 
@@ -281,6 +287,93 @@ Most capable models for architecture, design, and review.
 Downstream to the build agent for small follow-ups after all tasks pass
 review.
 
+### /magic-new-project
+
+**What it does:** Initializes a new project with deep context gathering,
+producing PROJECT.md (project context, architecture, conventions, decisions
+log) and ROADMAP.md (feature breakdown, dependencies, build order, status
+tracking).
+
+**When to use:** Once per project, before any feature brainstorming. This
+creates the project layer that all subsequent features reference.
+
+**Tools & access:** Full — `read, write, bash, grep, glob, agent`. Writes
+ONLY to `./.magic-pi/PROJECT.md` and `./.magic-pi/ROADMAP.md`.
+
+### /magic-init
+
+**What it does:** Generates a codebase map (`./.magic-pi/map.md`) for an
+existing project. Maps modules, responsibilities, dependencies, patterns,
+and entry points. Does NOT generate AGENTS.md files (preserves zero
+structural token cost).
+
+**When to use:** Once per existing codebase, before working on features in
+it. For new projects from scratch, use `/magic-new-project` instead.
+
+**Tools & access:** Full — `read, write, bash, grep, glob, agent`. Writes
+ONLY to `./.magic-pi/map.md`.
+
+### /magic-research
+
+**What it does:** Internet-connected research using Yahoo/Bing search via
+the native `webfetch` tool. Three modes:
+
+- `--explore` (default): broad comparative research. Dispatches 3-5
+  subagents in parallel, each fetching 2-3 pages. Returns a synthesized
+  brief saved to `./.magic-pi/research/<uuid>.md`.
+- `--diagnose`: narrow deep-dive. Dispatches 1 subagent for a specific
+  question (3-5 pages). Returns a targeted answer saved to
+  `./.magic-pi/research/<uuid>.md`.
+- `--lookup`: quick factual lookup. Direct fetch in main context (1 page,
+  inline answer, no file saved).
+
+**When to use:** Before `/magic-brainstorm` to research approaches, or
+during `/magic-debug` to check how upstream code works.
+
+**Tools & access:** Full — `read, bash, grep, glob, agent, webfetch`.
+Heavy fetching happens inside isolated subagents (explore/diagnose) to keep
+main context lean.
+
+**Examples:**
+
+```text
+/magic-research --explore compare Drizzle vs Prisma for Postgres
+/magic-research --diagnose why does SQLite WAL mode cause lock errors
+/magic-research --lookup what port does Express default to
+```
+
+### /magic-verify
+
+**What it does:** Verifies implementation against spec. Dispatches verifier
+subagents per UAT criterion, synthesizes verdicts, and produces a routing
+verdict: PASS, FIX_FORWARD (route to /magic-debug), or REPLAN (route to
+/magic-brainstorm).
+
+**When to use:** After `/magic-orchestrator` completes all tasks for a
+feature. This is the gate between implementation and shipping.
+
+**Tools & access:** Read-only — `read, bash, grep, glob, agent`.
+
+### /magic-resume
+
+**What it does:** Restores session context after restart. Reads state.json,
+identifies the last in-progress task, runs git-diff reconciliation to detect
+manual changes, and routes back to the orchestrator.
+
+**When to use:** After restarting opencode mid-orchestration.
+
+**Tools & access:** Read-only — `read, bash, grep, glob`.
+
+### /magic-ship
+
+**What it does:** Pushes branch, creates PR with auto-generated body sourced
+from spec, plan, state, and verification report. Filters `.magic-pi/`
+planning artifacts from the PR diff.
+
+**When to use:** After `/magic-verify` returns PASS.
+
+**Tools & access:** Read-only + bash — `read, bash, grep, glob`.
+
 ## Workflows
 
 ### Debug a bug
@@ -314,29 +407,72 @@ bugs go to `/magic-debug`; architecture findings needing design go to
 /magic-review src/services/payment/
 ```
 
+### Build a whole system from scratch
+
+Start with `/magic-new-project` to create the project layer, then
+brainstorm/orchestrate/verify/ship each feature in dependency order.
+
+```text
+/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
+/magic-research --explore e-commerce architecture patterns
+/magic-brainstorm auth subsystem
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md
+/magic-verify
+/magic-ship
+/magic-brainstorm product catalog  ← reads PROJECT.md + auth's spec
+... repeat for each feature in ROADMAP build order ...
+```
+
+### Resume after restart
+
+```text
+/magic-resume
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md  ← resumes from last task
+```
+
+### Feedback loop (when verify finds issues)
+
+```text
+/magic-verify
+  → PASS: /magic-ship
+  → FIX_FORWARD: /magic-debug (specific issue) → re-verify
+  → REPLAN: /magic-brainstorm (revises spec, appends revision log)
+```
+
 ## Repo structure
 
 ```text
 magic-pi-opencode/
-├── install.ps1                          # Windows installer
-├── install.sh                           # Unix installer
-├── commands/                            # 6 slash command definitions
-│   ├── magic.md                         # /magic — lists all commands
-│   ├── magic-ask.md                     # /magic-ask
-│   ├── magic-debug.md                   # /magic-debug
-│   ├── magic-review.md                  # /magic-review
-│   ├── magic-brainstorm.md              # /magic-brainstorm
-│   └── magic-orchestrator.md            # /magic-orchestrator
-├── references/                          # supporting docs loaded by commands via @-includes
-│   ├── root-cause-tracing.md            # tracing bad values backward to their origin (magic-debug)
-│   ├── defense-in-depth.md              # hardening guidance for after a fix (magic-debug)
-│   ├── condition-based-waiting.md       # replacing arbitrary timeouts with condition checks (magic-debug)
-│   ├── find-polluter.sh                 # bisection script for test-polluter flakiness (magic-debug)
-│   ├── writing.md                       # implementation-plan writing guide (magic-brainstorm)
-│   ├── implementer-prompt.md            # subagent prompt template for task implementation (magic-orchestrator)
-│   ├── spec-reviewer-prompt.md          # subagent prompt template for spec compliance review (magic-orchestrator)
-│   ├── code-quality-reviewer-prompt.md  # subagent prompt template for code quality review (magic-orchestrator)
-│   └── issue-verifier-prompt.md         # subagent prompt template for per-issue verification (magic-review)
+├── install.ps1
+├── install.sh
+├── commands/
+│   ├── magic.md
+│   ├── magic-ask.md
+│   ├── magic-brainstorm.md
+│   ├── magic-debug.md
+│   ├── magic-init.md
+│   ├── magic-new-project.md
+│   ├── magic-orchestrator.md
+│   ├── magic-research.md
+│   ├── magic-resume.md
+│   ├── magic-review.md
+│   ├── magic-ship.md
+│   └── magic-verify.md
+├── references/
+│   ├── code-quality-reviewer-prompt.md
+│   ├── condition-based-waiting.md
+│   ├── defense-in-depth.md
+│   ├── find-polluter.sh
+│   ├── implementer-prompt.md
+│   ├── integration-reviewer-prompt.md
+│   ├── issue-verifier-prompt.md
+│   ├── research-prompt.md
+│   ├── root-cause-tracing.md
+│   ├── spec-reviewer-prompt.md
+│   ├── ui-critique.md
+│   ├── ui-design.md
+│   ├── verify-prompt.md
+│   └── writing.md
 └── README.md
 ```
 
