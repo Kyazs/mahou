@@ -129,6 +129,20 @@ If returning from /magic-verify with a REPLAN verdict:
   plan) onward.
 </replan_support>
 
+<error_handling>
+- **PROJECT.md doesn't exist:** Tell user to run /magic-new-project first (or
+  proceed in feature-at-a-time mode for a one-off feature).
+- **Prior dependent spec missing:** If ROADMAP says this feature depends on
+  another feature, but that feature's spec doesn't exist in ./.magic-pi/specs/,
+  flag the inconsistency. Ask the user to verify the ROADMAP or brainstorm the
+  dependency first.
+- **User rejects design 3+ times:** Stop proposing new designs. Ask "what's
+  the core disagreement?" and restart from the user's framing of the problem.
+- **Replan mode but no revision log in spec:** Create the revision log section
+  in the spec. Note "Round 1 was the original spec. This is round 2." Then
+  proceed with the replan.
+</error_handling>
+
 <principles>
 - **One question at a time** -- don't overwhelm.
 - **Multiple choice preferred** -- easier to answer.

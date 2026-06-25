@@ -85,7 +85,7 @@ If you can't find relevant files for the scope, say so explicitly.
 
 ### Phase 2: Triage
 
-Scan all discovered files and list POTENTIAL issues across these four
+Scan all discovered files and list POTENTIAL issues across these
 categories only:
 
 1. **Correctness** — logic bugs, wrong assumptions, broken edge cases, race
