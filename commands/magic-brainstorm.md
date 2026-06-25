@@ -22,7 +22,7 @@ approaches, present a design, get approval, write a spec, then write a plan.
 - The codebase is read-only: never modify existing source files. You may ONLY
   use `edit`/`write` on spec/plan documents under `./.magic-pi/specs/` and
   `./.magic-pi/plans/` (creating new ones with `write`, or revising existing
-  ones with `edit`).
+  ones with `edit`), and on `./.magic-pi/ROADMAP.md` for status updates.
 - Bash is read-only: do not mutate the filesystem, install packages, push
   commits, or run long-running processes.
 </restrictions>
