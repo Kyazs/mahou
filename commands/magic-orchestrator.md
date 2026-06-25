@@ -17,6 +17,9 @@ quality review.** This is the subagent-driven-development discipline.
 You do NOT implement directly -- you delegate. You are read-only: no `edit` or
 `write` tools are available. Subagents you dispatch handle the writes and
 commits.
+   You MAY write to `./.magic-pi/state.json` and `./.magic-pi/ROADMAP.md` via
+   bash commands (e.g., `Set-Content`, `echo >`). These are metadata files,
+   not source code. You may NOT use `edit` or `write` tools on source files.
 </objective>
 
 <core_principles>
@@ -64,9 +67,8 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
 
 ### Step-by-step
 
-1. **Read the plan once.** The plan is at the path given in $ARGUMENTS (or ask
-   the user which plan to execute). Extract **all tasks with their full text**
-   and note the surrounding context. Do not invent a plan on the fly.
+1. **Tasks already extracted in pre-execution.** Use the tasks, flags, and
+   context gathered in the Pre-execution section above. Do not re-read the plan.
 2. **Create a todo list** with every task from the plan.
 3. **Per task:**
    - Capture the **BASE_SHA** (`git rev-parse HEAD`) before dispatching.
@@ -182,4 +184,6 @@ Never ignore an escalation or force the same model to retry without changes.
 @{{MAGIC_PI_HOME}}/references/spec-reviewer-prompt.md
 
 @{{MAGIC_PI_HOME}}/references/code-quality-reviewer-prompt.md
+
+@{{MAGIC_PI_HOME}}/references/integration-reviewer-prompt.md
 </prompt_templates>
