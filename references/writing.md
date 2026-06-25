@@ -79,8 +79,27 @@ self-contained changes that make sense independently.
 
 **Tech Stack:** [Key technologies/libraries]
 
+**Parallel:** false
+**Integration check interval:** 3
+
+**Dependency graph:**
+- Task 1: (none)
+- Task 2: (Task 1)
+- Task 3: (none)  ← independent, can parallelize
+- Task 4: (Task 1, Task 2)
+
 ---
 ```
+
+**New header fields:**
+- **Parallel:** `true` if tasks can be executed in parallel (requires
+  dependency graph with independent tasks). Default `false` (sequential).
+- **Integration check interval:** every N tasks, the orchestrator runs an
+  integration check (cumulative diff, interface alignment, earlier tests
+  pass, build green). Default 3.
+- **Dependency graph:** maps each task to its dependencies. Tasks with no
+  dependencies can be parallelized. Tasks with dependencies must wait for
+  their dependencies to complete.
 
 ## Task Structure
 
