@@ -72,6 +72,14 @@ reporting without verification (skipping Phase 3) ships false positives.
    relevant sections.
 4. **Identify key responsibilities.** What does this code DO, DEPEND ON, and
    what DEPENDS ON IT?
+1a. **UI detection** — if the scope contains UI surfaces (components, pages,
+    styles, templates, HTML/CSS files):
+    @{{MAGIC_PI_HOME}}/references/ui-critique.md
+    Phase 3 will use two-assessment synthesis for UI issues:
+      Assessment A: design review (Nielsen heuristics + cognitive load)
+      Assessment B: code inspection (interaction states, accessibility, drift)
+      Dispatch as separate subagents. Synthesize, don't concatenate.
+    If no UI surfaces in scope: skip this step entirely, zero cost.
 
 If you can't find relevant files for the scope, say so explicitly.
 
@@ -88,6 +96,14 @@ categories only:
    missing indexes, quadratic algorithms.
 4. **Architecture** — circular dependencies, god functions/modules, unclear
    responsibilities, tight coupling.
+5. **UI/UX** (only when ui-critique reference was loaded in step 1a) —
+   missing interaction states (default/hover/focus/active/disabled/loading/
+   error/success), cognitive load violations (≤4 items per group, ≤4 visible
+   options at decision point), AI slop patterns (side-stripe borders,
+   gradient text, glassmorphism-as-default, identical card grids, tracked
+   uppercase eyebrows), design system drift, accessibility failures (WCAG AA
+   contrast, keyboard navigation, ARIA labels, focus indicators). Score
+   against Nielsen heuristics (0-4 per heuristic, 40 total).
 
 **Do NOT include:** style, formatting, naming (unless misleading), minor
 suggestions, nits, or positive feedback.
@@ -111,6 +127,16 @@ For EACH issue, spawn an independent verification subagent:
 - Starts neutral, decides based on evidence.
 
 Dispatch verifiers in parallel: batch multiple Task calls in a single message.
+
+**UI issue verification (when ui-critique reference was loaded):**
+For UI/UX issues, use two-assessment synthesis instead of single-verifier:
+- Assessment A: design review subagent (evaluates Nielsen heuristics,
+  cognitive load, AI slop patterns)
+- Assessment B: code inspection subagent (checks interaction states in code,
+  accessibility attributes, design system token usage, drift classification)
+Dispatch as separate subagents. They must not see each other's output.
+Synthesize their findings: note where they agree, where B caught what A
+missed, and where findings are false positives.
 
 Each returns: **CONFIRMED** (real, with evidence) | **REFUTED** (doesn't exist,
 with reasoning) | **UNDETERMINED** (can't decide, what's missing).
