@@ -43,6 +43,25 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
 </when_to_use>
 
 <process>
+### Pre-execution
+
+1. **Read the plan once.** Extract all tasks with their full text AND:
+   - The `Parallel` flag from the plan header (default: false)
+   - The `Integration check interval` from the plan header (default: 3)
+   - The `Dependency graph` from the plan header (if present)
+2. **Read project context (if exists):**
+   - `./.magic-pi/map.md` — codebase memory. Include relevant portions in
+     implementer context.
+   - `./.magic-pi/models.json` — model routing config (maps task categories
+     to model IDs). If present, use it for model selection.
+   - `./.magic-pi/PROJECT.md` — project conventions. Include relevant
+     conventions in implementer context.
+3. **Initialize state.** Create or reset `./.magic-pi/state.json` with:
+   - plan path, spec path, started_at timestamp
+   - config: { parallel, integration_check_interval }
+   - tasks: all pending, no SHAs yet
+   - last_known_good_sha: current HEAD
+
 ### Step-by-step
 
 1. **Read the plan once.** The plan is at the path given in $ARGUMENTS (or ask
@@ -51,18 +70,47 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
 2. **Create a todo list** with every task from the plan.
 3. **Per task:**
    - Capture the **BASE_SHA** (`git rev-parse HEAD`) before dispatching.
+   - Write state.json: mark task as `in_progress`, record `time_started`.
    - Dispatch an **implementer subagent** using the template at
      `{{MAGIC_PI_HOME}}/references/implementer-prompt.md`. Paste the full task
      text and scene-setting context. Pick the model per complexity.
    - If the implementer asks questions, **answer them** and re-dispatch.
-   - Handle the implementer's status (see below).
-   - Dispatch a **spec compliance reviewer** using
+    - Handle the implementer's status (see below).
+    - **NEEDS_CONTEXT with external unknown:** If the implementer needs
+      context about an external library, API, or documentation that isn't
+      in the plan or codebase:
+      - Dispatch an `explore` subagent with `webfetch` access to research
+        the external unknown (2-3 pages max).
+      - The subagent returns a brief (NOT raw pages).
+      - Feed the brief to the implementer and re-dispatch.
+      - This is condition-gated: only fires for external unknowns, not for
+        plan/spec ambiguities (those are answered from the plan).
+    - Dispatch a **spec compliance reviewer** using
      `{{MAGIC_PI_HOME}}/references/spec-reviewer-prompt.md`. Loop until it
      passes.
    - Dispatch a **code quality reviewer** using
      `{{MAGIC_PI_HOME}}/references/code-quality-reviewer-prompt.md`, passing
-     BASE_SHA and HEAD_SHA. Loop until Approved.
-   - Mark the task complete in the todo list.
+      BASE_SHA and HEAD_SHA. Loop until Approved.
+    - **Record review loop counts in state.json:** After each spec compliance
+      loop, record `spec_compliance_loops`. After each code quality loop,
+      record `code_quality_loops`. If the implementer was blocked, record
+      `was_blocked: true` and the concern.
+    - **Update state.json:** mark task as `complete`, record `head_sha`,
+      `model` used, `time_completed`, and any `concerns`. Set
+      `ui_task: true` if the task touched UI code.
+    - **Update ROADMAP.md:** update task-level status for this feature.
+    - Mark the task complete in the todo list.
+   - **Integration check (every N tasks):** After every N tasks (N from the
+     plan header, default 3), dispatch an integration reviewer subagent
+     using the template at
+     `{{MAGIC_PI_HOME}}/references/integration-reviewer-prompt.md`.
+     Pass BASE_SHA (from before the first task) and current HEAD_SHA.
+     The reviewer checks: interfaces between tasks still align, earlier
+     tests still pass, build is green.
+     - If PASS: continue to next task.
+     - If FAIL: STOP. Route to /magic-debug for targeted fix at the seam.
+       Do not proceed until integration is restored.
+     - Record the result in state.json under `integration_checks`.
 4. **After all tasks:** dispatch a **final code reviewer** for the entire
    implementation, then tell the user the work is done and how to finish the
    branch.
@@ -85,6 +133,18 @@ review. Note observations and proceed.
 **BLOCKED:** Assess: context problem -> provide more context. Needs more
 reasoning -> more capable model. Too large -> break into smaller pieces. Plan
 wrong -> escalate to human.
+
+**BLOCKED 3+ times on the same task:** Stop. Flag "the plan may be wrong for
+this task." Route to /magic-brainstorm to replan the affected task. Do not
+keep retrying with the same approach.
+
+**Spec compliance review loops 3+ times:** Flag "the spec may be ambiguous for
+this task." Ask the human to review the spec section. The implementer may be
+interpreting the requirement differently than intended.
+
+**Code quality review loops 3+ times:** Flag "the implementer may be
+under-resourced for this task." Consider upgrading to a more capable model
+or breaking the task into smaller pieces.
 
 Never ignore an escalation or force the same model to retry without changes.
 </implementer_status>
