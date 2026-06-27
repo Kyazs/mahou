@@ -1,49 +1,63 @@
 # magic-pi-opencode
 
-A portable, shareable set of opencode slash commands ported from the
-[magic-pi](https://github.com/) pi agent configuration. Brings five disciplined
-workflows into opencode — ask, debug, review, brainstorm, orchestrator — as
-slash commands you run like `/magic-debug`, `/magic-review`, etc.
+A portable set of opencode slash commands that enforce disciplined software engineering workflows — debugging, review, brainstorm, orchestration, and project lifecycle management.
 
-No plugins, no MCP servers, no npm dependencies. Just markdown command files
-and reference docs.
+No plugins, no MCP servers, no npm dependencies. Just markdown command files and reference docs.
 
-## Why use these commands
+## Table of Contents
+
+- [Background](#background)
+- [Install](#install)
+- [Usage](#usage)
+- [Quick Reference](#quick-reference)
+- [Commands](#commands)
+- [Workflows](#workflows)
+- [Architecture](#architecture)
+- [Repository Structure](#repository-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Background
 
 opencode ships built-in `plan` and `build` agents that do the work. magic-pi
-commands enforce *how* the work is done:
+commands enforce *how* the work is done — root cause before fix, verify before
+report, design before code, ship after verify.
 
-- **`/magic-debug`** — 4-phase root-cause debugging. No fixes before
-  investigation is complete.
-- **`/magic-review`** — read-only code review with per-issue verification
-  subagents. Only confirmed issues reach the report.
-- **`/magic-brainstorm`** — design to spec to plan. No code or scaffolding
-  until the design is approved.
-- **`/magic-orchestrator`** — execute a plan task-by-task with two-stage
-  review (spec compliance, then code quality) after each task.
-- **`/magic-ask`** — read-only explanation mode that can't accidentally mutate
-  your code.
+The framework operates across three layers:
 
-`plan` and `build` are not duplicated — magic-pi complements them.
+- **Project layer** — initialize projects, research approaches, map existing
+  codebases. Produces PROJECT.md, ROADMAP.md, and map.md for cross-feature
+  context.
+- **Feature layer** — brainstorm specs, orchestrate implementation, review
+  code, verify against spec. The core build cycle with feedback loops.
+- **Lifecycle layer** — resume sessions, ship PRs. Closes the loop between
+  implementation and delivery.
 
-## How it works
+### How it works
 
 Each command is a markdown file with YAML frontmatter. opencode reads the
 frontmatter to register the slash command and enforce tool access. The body
 becomes the command's prompt.
 
 - **Tool access is enforced, not requested.** The `tools:` frontmatter lists
-  which tools a command may use. Read-only commands (`magic-ask`,
-  `magic-review`, `magic-orchestrator`) simply omit `write`/`edit` — opencode
-  blocks mutations at the tool level, not just by prompt instruction.
+  which tools a command may use. Read-only commands omit `write`/`edit` —
+  opencode blocks mutations at the tool level, not just by prompt instruction.
 - **Reference docs load via `@`-includes.** Command bodies use
   `@{{MAGIC_PI_HOME}}/references/<file>.md` to pull in technique guides and
-  subagent prompt templates. The token is resolved to an absolute path
-  at install time.
+  subagent prompt templates. The token is resolved to an absolute path at
+  install time.
+- **Zero structural token cost.** Nothing auto-injects on every prompt. All
+  context loads only when a command is invoked. Heavy data (web pages, large
+  file reads) stays inside subagent disposable context.
 - **No runtime dependencies.** Everything is static markdown. Nothing is
-  downloaded from the internet.
+  downloaded from the internet. No MCP servers, no hooks, no telemetry.
 
 ## Install
+
+### Prerequisites
+
+- [opencode](https://opencode.ai) installed and working
+- That's it. No npm dependencies, no plugins, no MCP servers.
 
 ### Windows (PowerShell)
 
@@ -79,7 +93,41 @@ chmod +x install.sh
 ./install.sh --uninstall       # Unix
 ```
 
-## Quick reference
+## Usage
+
+### Typical workflow
+
+```text
+/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
+/magic-research --explore e-commerce architecture patterns
+/magic-brainstorm auth subsystem
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md
+/magic-verify
+/magic-ship
+```
+
+If verify returns REPLAN, go back to brainstorm. If FIX_FORWARD, use
+`/magic-debug`.
+
+### Quick start (single feature)
+
+If you already have a project and just want to build one feature:
+
+```text
+/magic-brainstorm I want to add a webhook system for real-time notifications
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md
+/magic-verify
+/magic-ship
+```
+
+### Resume after restart
+
+```text
+/magic-resume
+/magic-orchestrator ./.magic-pi/plans/<uuid>.md  ← resumes from last task
+```
+
+## Quick Reference
 
 | Command | Purpose | Access |
 |---|---|---|
@@ -95,8 +143,6 @@ chmod +x install.sh
 | `/magic-verify` | Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN | read-only |
 | `/magic-resume` | Resume work from previous session with reconciliation | read-only |
 | `/magic-ship` | Push branch, create PR, filter .magic-pi/ artifacts | read-only + bash |
-
-Detailed coverage of each command is in the next section.
 
 ## Commands
 
@@ -176,15 +222,18 @@ For a single specific bug, use `/magic-debug` instead.
 
 1. **Discovery** — parse the scope, find relevant files, read each one, identify
    key responsibilities and dependencies. Dispatches `explore` subagents for
-   broad areas.
-2. **Triage** — lists potential issues across four categories: Correctness
-   (logic bugs, race conditions, dead code), Security (injection, auth bypass,
+   broad areas. Detects UI surfaces and loads UI critique methodology if
+   applicable.
+2. **Triage** — lists potential issues across categories: Correctness (logic
+   bugs, race conditions, dead code), Security (injection, auth bypass,
    secrets), Performance (N+1 queries, memory leaks, quadratic algorithms),
-   Architecture (circular dependencies, god modules, tight coupling). No style
-   or formatting nits.
+   Architecture (circular dependencies, god modules, tight coupling), and
+   UI/UX (interaction states, cognitive load, AI slop, accessibility) when UI
+   is in scope. No style or formatting nits.
 3. **Verification** — for each issue, an independent `general` subagent reads
    the actual code and returns **CONFIRMED**, **REFUTED**, or **UNDETERMINED**.
-   Verifiers are read-only by instruction. Dispatched in parallel.
+   Verifiers are read-only by instruction. Dispatched in parallel. UI issues
+   use two-assessment synthesis (design review + code inspection).
 4. **Final Report** — reports only confirmed issues with evidence and fix
    suggestions. Refuted and undetermined issues are listed separately.
 
@@ -207,31 +256,38 @@ codebase.
 **When to use:** When designing a new feature or subsystem before
 implementation.
 
-**Process:** A 12-step checklist:
+**Process:** A 13-step checklist:
 
-1. Explore project context (files, docs, recent commits).
+1. Explore project context — reads PROJECT.md, ROADMAP.md, prior dependent
+   specs, research briefs, codebase map, relevant files, and recent commits.
 2. Scope check — flag if the request spans multiple independent subsystems.
 3. Ask clarifying questions, one at a time, multiple choice preferred.
 4. Propose 2-3 approaches with trade-offs.
-5. Present the design in sections, getting approval after each.
-6. Write the spec to `./.magic-pi/specs/<uuid>.md`.
+5. Present the design in sections, getting approval after each. Enumerate key
+   states for UI features (default, empty, loading, error, success, edge
+   cases). Run AI slop test for visual direction.
+6. Write the spec to `./.magic-pi/specs/<uuid>.md`. Adaptive depth: compact
+   form for clear requests, full structured form for ambiguous ones.
 7. Spec self-review (unfilled tokens, consistency, scope, ambiguity).
 8. User reviews the spec.
 9. Write the implementation plan to `./.magic-pi/plans/<uuid>.md`.
 10. Plan self-review.
 11. User reviews the plan.
-12. Hand off to `/magic-orchestrator` or the build agent.
+12. Update ROADMAP.md — set feature status to planned.
+13. Hand off to `/magic-orchestrator` or the build agent.
 
 **Hard gate:** No code, scaffolding, or implementation action until the design
 is presented AND approved. This applies to every request regardless of
 perceived simplicity.
 
+**Replan support:** If returning from `/magic-verify` with a REPLAN verdict,
+appends to the spec's revision log (round N+1) without overwriting prior
+rounds. Revises only affected sections.
+
 **Tools & access:** Full tool access in frontmatter (`read`, `write`, `edit`,
 `bash`, `grep`, `glob`, `agent`). The command's prompt enforces read-only
-behavior on the codebase — it may ONLY use `write`/`edit` on spec and plan
-documents under `./.magic-pi/specs/` and `./.magic-pi/plans/`. Unlike
-`magic-ask`, `magic-review`, and `magic-orchestrator` (where read-only access
-is enforced at the tool level), this is a prompt-level constraint.
+behavior on the codebase — it may ONLY use `write`/`edit` on spec, plan, and
+ROADMAP documents under `./.magic-pi/`.
 
 **Example:**
 
@@ -256,12 +312,15 @@ agent instead.
 2. Dispatch an implementer subagent with the full task text pasted into the
    prompt (the subagent never reads the plan file).
 3. Handle the implementer's status: **DONE**, **DONE_WITH_CONCERNS**,
-   **BLOCKED**, or **NEEDS_CONTEXT**.
+   **BLOCKED**, or **NEEDS_CONTEXT**. On external unknowns, dispatches a
+   research subagent with `webfetch` access.
 4. Dispatch a spec compliance reviewer — verifies the implementer built what
    was requested, nothing more, nothing less. Loop until it passes.
 5. Dispatch a code quality reviewer — verifies the implementation is clean,
    tested, and maintainable. Loop until Approved.
-6. Mark the task complete and move to the next.
+6. Mark the task complete, update state.json and ROADMAP.md.
+7. Every N tasks (default 3): dispatch an integration reviewer to check seam
+   bugs between tasks.
 
 After all tasks: a final code review for the entire implementation, then
 branch finish guidance.
@@ -272,6 +331,7 @@ quality review does not start until spec compliance passes.
 
 **Tools & access:** Read-only orchestrator — `read`, `bash`, `grep`, `glob`,
 `agent`. No `edit` or `write` tools. Subagents handle all writes and commits.
+May write to state.json and ROADMAP.md via bash.
 
 **Model selection:** Cheap/fast models for mechanical tasks (1-2 files, clear
 spec). Standard models for integration tasks (multi-file, pattern matching).
@@ -284,8 +344,7 @@ Most capable models for architecture, design, and review.
 ```
 
 **Integration:** Upstream from `/magic-brainstorm` (produces the plan).
-Downstream to the build agent for small follow-ups after all tasks pass
-review.
+Downstream to `/magic-verify` after all tasks pass review.
 
 ### /magic-new-project
 
@@ -299,6 +358,12 @@ creates the project layer that all subsequent features reference.
 
 **Tools & access:** Full — `read, write, bash, grep, glob, agent`. Writes
 ONLY to `./.magic-pi/PROJECT.md` and `./.magic-pi/ROADMAP.md`.
+
+**Example:**
+
+```text
+/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
+```
 
 ### /magic-init
 
@@ -423,13 +488,6 @@ brainstorm/orchestrate/verify/ship each feature in dependency order.
 ... repeat for each feature in ROADMAP build order ...
 ```
 
-### Resume after restart
-
-```text
-/magic-resume
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md  ← resumes from last task
-```
-
 ### Feedback loop (when verify finds issues)
 
 ```text
@@ -439,7 +497,46 @@ brainstorm/orchestrate/verify/ship each feature in dependency order.
   → REPLAN: /magic-brainstorm (revises spec, appends revision log)
 ```
 
-## Repo structure
+## Architecture
+
+### Design invariants
+
+These rules must not be violated by any command or reference:
+
+1. **Zero structural token cost** — nothing auto-injects on every prompt;
+   everything loads via `@`-include when invoked or inside subagent isolated
+   context
+2. **Tool-level read-only enforcement** — read-only commands omit `edit`/`write`
+   in frontmatter
+3. **No MCP, no npm, no plugins, no hooks, no telemetry** — pure markdown +
+   native tools
+4. **Subagent isolation for heavy work** — `webfetch` and large reads happen in
+   `explore`/`general` subagents
+5. **Feedback loops** — every downstream command has PASS / FIX_FORWARD / REPLAN
+   return edges
+6. **State on disk** — `state.json` written via bash, read only when needed
+7. **UI principles gated behind UI detection** — non-UI projects pay zero cost
+8. **Append-only specs** — replan appends revision log, doesn't overwrite
+9. **Project layer above feature layer** — PROJECT.md + ROADMAP.md link features
+   into a coherent system
+10. **No AGENTS.md auto-generation** — `magic-init` produces `map.md` only
+
+### Artifact structure
+
+```text
+.magic-pi/
+├── PROJECT.md          ← project context, architecture, conventions, decisions log
+├── ROADMAP.md          ← feature breakdown, dependencies, build order, status
+├── state.json          ← enriched session state (orchestrator, for resume)
+├── map.md              ← codebase map (from /magic-init, no AGENTS.md)
+├── specs/              ← per-feature specs (linked from ROADMAP)
+├── plans/              ← per-feature plans (linked from ROADMAP)
+├── research/           ← research briefs (project-level + feature-level)
+├── verify/             ← verification reports
+└── postmortems/        ← post-mortems (Phase 2, directory reserved)
+```
+
+## Repository Structure
 
 ```text
 magic-pi-opencode/
@@ -476,10 +573,20 @@ magic-pi-opencode/
 └── README.md
 ```
 
-## Requirements
+## Contributing
 
-- [opencode](https://opencode.ai) installed and working
-- That's it. No npm dependencies, no plugins, no MCP servers.
+PRs are welcome. This is a configuration package, not a library — changes should
+preserve the design invariants listed in [Architecture](#architecture).
+
+To contribute:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes — follow existing markdown conventions
+4. Ensure no design invariants are violated
+5. Submit a pull request
+
+For questions or issues, please open a [GitHub issue](https://github.com/).
 
 ## License
 
