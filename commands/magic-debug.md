@@ -154,6 +154,8 @@ If you catch yourself thinking:
 
 @{{MAGIC_PI_HOME}}/references/condition-based-waiting.md
 
+@{{MAGIC_PI_HOME}}/references/git-workflow.md
+
 The bisection script for test polluters is at
 `{{MAGIC_PI_HOME}}/references/find-polluter.sh`.
 </references>
