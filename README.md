@@ -560,6 +560,7 @@ magic-pi-opencode/
 │   ├── condition-based-waiting.md
 │   ├── defense-in-depth.md
 │   ├── find-polluter.sh
+│   ├── git-workflow.md
 │   ├── implementer-prompt.md
 │   ├── integration-reviewer-prompt.md
 │   ├── issue-verifier-prompt.md
