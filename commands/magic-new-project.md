@@ -159,3 +159,7 @@ Tell the user:
 - Do NOT generate AGENTS.md files — opencode auto-reads them, which would
   create permanent per-prompt token cost.
 </restrictions>
+
+<references>
+@{{MAGIC_PI_HOME}}/references/git-workflow.md
+</references>
