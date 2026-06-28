@@ -149,3 +149,7 @@ Update ROADMAP.md: feature status → `done`.
 - Do NOT force-push. If push fails due to remote changes, tell the user to
   pull and resolve first.
 </restrictions>
+
+<references>
+@{{MAGIC_PI_HOME}}/references/git-workflow.md
+</references>
