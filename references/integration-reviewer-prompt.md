@@ -1,6 +1,6 @@
 # Integration Reviewer Prompt Template
 
-Use this template when the magic-orchestrator agent dispatches a periodic
+Use this template when the mahou-orchestrator agent dispatches a periodic
 integration check after every N tasks (default N=3). The reviewer checks that
 the seams between tasks are still intact — interfaces align, earlier tests
 still pass, build is green.
@@ -74,11 +74,11 @@ Task tool (general):
     - **Recommendation:** proceed | stop and fix (with specific fix target)
 ```
 
-## Notes for the controller (magic-orchestrator agent)
+## Notes for the controller (mahou-orchestrator agent)
 
 - Dispatch this after every N tasks (N from the plan header, default 3).
 - Pass the BASE_SHA from before the FIRST task and the current HEAD_SHA.
-- If the verdict is FAIL, STOP execution. Route to /magic-debug for targeted
+- If the verdict is FAIL, STOP execution. Route to /mahou-debug for targeted
   fix at the seam. Do not proceed to the next task until integration is
   restored.
 - If the verdict is PASS, continue to the next task.

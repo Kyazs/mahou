@@ -16,7 +16,7 @@ file that subsequent commands and explore subagents can reference for
 codebase memory — without the per-prompt token cost of AGENTS.md auto-injection.
 
 This is for existing codebases. For new projects from scratch, use
-/magic-new-project instead.
+/mahou-new-project instead.
 </objective>
 
 <context>
@@ -62,7 +62,7 @@ at to verify their claims — trust but verify.
 
 ### Phase 3: Write map.md
 
-Write to `./.magic-pi/map.md`:
+Write to `./.mahou/map.md`:
 
 ```markdown
 # Codebase Map
@@ -105,8 +105,8 @@ Write to `./.magic-pi/map.md`:
 
 Tell the user:
 
-> Codebase map written to `./.magic-pi/map.md`. Subsequent commands
-> (/magic-brainstorm, /magic-orchestrator, /magic-review) will reference
+> Codebase map written to `./.mahou/map.md`. Subsequent commands
+> (/mahou-brainstorm, /mahou-orchestrator, /mahou-review) will reference
 > this for codebase context. Explore subagents will read it as their first
 > step.
 </process>
@@ -123,7 +123,7 @@ Tell the user:
 
 <restrictions>
 - Do NOT generate AGENTS.md files anywhere in the directory tree.
-- Write ONLY to `./.magic-pi/map.md`.
+- Write ONLY to `./.mahou/map.md`.
 - The map is a reference, not a comprehensive code analysis. Keep it
   high-level — module inventory and patterns, not line-by-line documentation.
 </restrictions>

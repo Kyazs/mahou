@@ -1,6 +1,6 @@
 # UI Critique Reference
 
-Loaded by /magic-review via @-include ONLY when the review scope contains UI
+Loaded by /mahou-review via @-include ONLY when the review scope contains UI
 surfaces (components, pages, styles, templates). Non-UI reviews skip this
 entirely — zero token cost.
 
@@ -183,7 +183,7 @@ Present the full critique in this structure (in chat, not just a file):
    single biggest opportunity
 4. **What's Working** — 2-3 specific things done well
 5. **Priority Issues** — 3-5 most impactful problems, P0-P3 tagged, with fix
-   and suggested magic-pi command
+   and suggested mahou command
 6. **Persona Red Flags** — per persona, specific elements/interactions that
    fail
 7. **Minor Observations** — quick notes on smaller issues

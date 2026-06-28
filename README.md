@@ -1,4 +1,6 @@
-# magic-pi-opencode
+# mahou
+
+> 魔法 — _mahou_ is Japanese for "magic".
 
 A portable set of opencode slash commands that enforce disciplined software engineering workflows — debugging, review, brainstorm, orchestration, and project lifecycle management.
 
@@ -19,7 +21,7 @@ No plugins, no MCP servers, no npm dependencies. Just markdown command files and
 
 ## Background
 
-opencode ships built-in `plan` and `build` agents that do the work. magic-pi
+opencode ships built-in `plan` and `build` agents that do the work. mahou
 commands enforce *how* the work is done — root cause before fix, verify before
 report, design before code, ship after verify.
 
@@ -43,7 +45,7 @@ becomes the command's prompt.
   which tools a command may use. Read-only commands omit `write`/`edit` —
   opencode blocks mutations at the tool level, not just by prompt instruction.
 - **Reference docs load via `@`-includes.** Command bodies use
-  `@{{MAGIC_PI_HOME}}/references/<file>.md` to pull in technique guides and
+  `@{{MAHOU_HOME}}/references/<file>.md` to pull in technique guides and
   subagent prompt templates. The token is resolved to an absolute path at
   install time.
 - **Zero structural token cost.** Nothing auto-injects on every prompt. All
@@ -62,25 +64,47 @@ becomes the command's prompt.
 ### Windows (PowerShell)
 
 ```powershell
-cd magic-pi-opencode
+cd mahou
 .\install.ps1
 ```
 
 ### macOS / Linux (bash)
 
 ```bash
-cd magic-pi-opencode
+cd mahou
 chmod +x install.sh
 ./install.sh
 ```
 
 **After install, restart opencode** for the new commands to appear.
 
+### Upgrading from magic-pi
+
+mahou was previously named `magic-pi-opencode`. The installer does not remove
+the old global files. If you upgraded, clean up the legacy install once:
+
+```powershell
+# Windows (PowerShell)
+Remove-Item "$env:USERPROFILE\.config\opencode\magic-pi" -Recurse -Force
+Remove-Item "$env:USERPROFILE\.config\opencode\command\magic*.md" -Force
+```
+```bash
+# macOS / Linux (bash)
+rm -rf ~/.config/opencode/magic-pi
+rm -f ~/.config/opencode/command/magic*.md
+```
+
+Existing project artifacts live in `./.magic-pi/`; rename the folder to
+`./.mahou/` so the rebranded commands can find them:
+```bash
+mv ./.magic-pi ./.mahou
+```
+
 ### What the installer does
 
-1. Copies `references/` to `~/.config/opencode/magic-pi/references/`.
+1. Copies `references/` to `~/.config/opencode/mahou/references/`.
 2. Copies `commands/*.md` to `~/.config/opencode/command/`, replacing
-   `{{MAGIC_PI_HOME}}` with the resolved absolute path (for `@`-include
+   `{{MAHOU_HOME}}` with the resolved absolute path (for `@`-include
    compatibility).
 3. Nothing is downloaded from the internet. No dependencies required.
 
@@ -98,55 +122,55 @@ chmod +x install.sh
 ### Typical workflow
 
 ```text
-/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
-/magic-research --explore e-commerce architecture patterns
-/magic-brainstorm auth subsystem
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md
-/magic-verify
-/magic-ship
+/mahou-new-project I want to build an e-commerce platform with React + Node + Postgres
+/mahou-research --explore e-commerce architecture patterns
+/mahou-brainstorm auth subsystem
+/mahou-orchestrator ./.mahou/plans/<uuid>.md
+/mahou-verify
+/mahou-ship
 ```
 
 If verify returns REPLAN, go back to brainstorm. If FIX_FORWARD, use
-`/magic-debug`.
+`/mahou-debug`.
 
 ### Quick start (single feature)
 
 If you already have a project and just want to build one feature:
 
 ```text
-/magic-brainstorm I want to add a webhook system for real-time notifications
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md
-/magic-verify
-/magic-ship
+/mahou-brainstorm I want to add a webhook system for real-time notifications
+/mahou-orchestrator ./.mahou/plans/<uuid>.md
+/mahou-verify
+/mahou-ship
 ```
 
 ### Resume after restart
 
 ```text
-/magic-resume
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md  ← resumes from last task
+/mahou-resume
+/mahou-orchestrator ./.mahou/plans/<uuid>.md  ← resumes from last task
 ```
 
 ## Quick Reference
 
 | Command | Purpose | Access |
 |---|---|---|
-| `/magic` | List all magic-pi commands | read-only |
-| `/magic-new-project` | Initialize project — PROJECT.md + ROADMAP.md | full (.magic-pi/ only) |
-| `/magic-init` | Generate codebase map for existing projects | full (.magic-pi/ only) |
-| `/magic-research` | Internet research — explore, diagnose, or lookup | full (webfetch) |
-| `/magic-ask` | Answer questions / explain code without changes | read-only |
-| `/magic-debug` | Systematic root-cause debugging (4 phases) | full |
-| `/magic-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
-| `/magic-brainstorm` | Design to spec to implementation plan | spec/plan writable |
-| `/magic-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
-| `/magic-verify` | Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN | read-only |
-| `/magic-resume` | Resume work from previous session with reconciliation | read-only |
-| `/magic-ship` | Push branch, create PR, filter .magic-pi/ artifacts | read-only + bash |
+| `/mahou` | List all mahou commands | read-only |
+| `/mahou-new-project` | Initialize project — PROJECT.md + ROADMAP.md | full (.mahou/ only) |
+| `/mahou-init` | Generate codebase map for existing projects | full (.mahou/ only) |
+| `/mahou-research` | Internet research — explore, diagnose, or lookup | full (webfetch) |
+| `/mahou-ask` | Answer questions / explain code without changes | read-only |
+| `/mahou-debug` | Systematic root-cause debugging (4 phases) | full |
+| `/mahou-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
+| `/mahou-brainstorm` | Design to spec to implementation plan | spec/plan writable |
+| `/mahou-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
+| `/mahou-verify` | Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN | read-only |
+| `/mahou-resume` | Resume work from previous session with reconciliation | read-only |
+| `/mahou-ship` | Push branch, create PR, filter .mahou/ artifacts | read-only + bash |
 
 ## Commands
 
-### /magic-ask
+### /mahou-ask
 
 **What it does:** Answers questions and explains code without making any
 changes.
@@ -157,7 +181,7 @@ explore a codebase without risk of accidental edits.
 **Process:** Direct answer — no phases. Reads the relevant code and explains
 with specific file:line references. If the question is ambiguous, asks for
 clarification first. If you ask it to make changes, it redirects you to
-`/magic-debug`, `/magic-brainstorm`, or the build agent.
+`/mahou-debug`, `/mahou-brainstorm`, or the build agent.
 
 **Tools & access:** Read-only — `read`, `bash`, `grep`, `glob`. No `edit` or
 `write` tools are available.
@@ -165,11 +189,11 @@ clarification first. If you ask it to make changes, it redirects you to
 **Examples:**
 
 ```text
-/magic-ask How does the retry logic in the HTTP client work?
-/magic-ask What does the PaymentService class depend on?
+/mahou-ask How does the retry logic in the HTTP client work?
+/mahou-ask What does the PaymentService class depend on?
 ```
 
-### /magic-debug
+### /mahou-debug
 
 **What it does:** Systematic root-cause debugging. Finds and fixes the root
 cause, not the symptom.
@@ -206,17 +230,17 @@ working examples. Runs independent research questions in parallel.
 **Examples:**
 
 ```text
-/magic-debug The auth tests are failing intermittently after the refactor
-/magic-debug Payment webhook returns 500 for amounts over $1000
+/mahou-debug The auth tests are failing intermittently after the refactor
+/mahou-debug Payment webhook returns 500 for amounts over $1000
 ```
 
-### /magic-review
+### /mahou-review
 
 **What it does:** Code review of an existing scope. Finds real issues, verifies
 them independently, and reports only what survives verification.
 
 **When to use:** When you want to review a module, feature, directory, or PR.
-For a single specific bug, use `/magic-debug` instead.
+For a single specific bug, use `/mahou-debug` instead.
 
 **Process:** Four phases:
 
@@ -243,11 +267,11 @@ For a single specific bug, use `/magic-debug` instead.
 **Examples:**
 
 ```text
-/magic-review src/services/payment/
-/magic-review Review the auth module for security issues
+/mahou-review src/services/payment/
+/mahou-review Review the auth module for security issues
 ```
 
-### /magic-brainstorm
+### /mahou-brainstorm
 
 **What it does:** Turns a vague idea into a validated design spec and a detailed
 implementation plan through collaborative dialogue — without touching the
@@ -266,43 +290,43 @@ implementation.
 5. Present the design in sections, getting approval after each. Enumerate key
    states for UI features (default, empty, loading, error, success, edge
    cases). Run AI slop test for visual direction.
-6. Write the spec to `./.magic-pi/specs/<uuid>.md`. Adaptive depth: compact
+6. Write the spec to `./.mahou/specs/<uuid>.md`. Adaptive depth: compact
    form for clear requests, full structured form for ambiguous ones.
 7. Spec self-review (unfilled tokens, consistency, scope, ambiguity).
 8. User reviews the spec.
-9. Write the implementation plan to `./.magic-pi/plans/<uuid>.md`.
+9. Write the implementation plan to `./.mahou/plans/<uuid>.md`.
 10. Plan self-review.
 11. User reviews the plan.
 12. Update ROADMAP.md — set feature status to planned.
-13. Hand off to `/magic-orchestrator` or the build agent.
+13. Hand off to `/mahou-orchestrator` or the build agent.
 
 **Hard gate:** No code, scaffolding, or implementation action until the design
 is presented AND approved. This applies to every request regardless of
 perceived simplicity.
 
-**Replan support:** If returning from `/magic-verify` with a REPLAN verdict,
+**Replan support:** If returning from `/mahou-verify` with a REPLAN verdict,
 appends to the spec's revision log (round N+1) without overwriting prior
 rounds. Revises only affected sections.
 
 **Tools & access:** Full tool access in frontmatter (`read`, `write`, `edit`,
 `bash`, `grep`, `glob`, `agent`). The command's prompt enforces read-only
 behavior on the codebase — it may ONLY use `write`/`edit` on spec, plan, and
-ROADMAP documents under `./.magic-pi/`.
+ROADMAP documents under `./.mahou/`.
 
 **Example:**
 
 ```text
-/magic-brainstorm I want to add a webhook system for real-time notifications
+/mahou-brainstorm I want to add a webhook system for real-time notifications
 ```
 
-Output is spec and plan files under `./.magic-pi/`, not code changes.
+Output is spec and plan files under `./.mahou/`, not code changes.
 
-### /magic-orchestrator
+### /mahou-orchestrator
 
 **What it does:** Executes an implementation plan task-by-task via subagents,
 with two-stage review after each task.
 
-**When to use:** When you have a plan (typically from `/magic-brainstorm`) and
+**When to use:** When you have a plan (typically from `/mahou-brainstorm`) and
 the tasks are mostly independent. For a single focused change, use the build
 agent instead.
 
@@ -340,13 +364,13 @@ Most capable models for architecture, design, and review.
 **Example:**
 
 ```text
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md
+/mahou-orchestrator ./.mahou/plans/<uuid>.md
 ```
 
-**Integration:** Upstream from `/magic-brainstorm` (produces the plan).
-Downstream to `/magic-verify` after all tasks pass review.
+**Integration:** Upstream from `/mahou-brainstorm` (produces the plan).
+Downstream to `/mahou-verify` after all tasks pass review.
 
-### /magic-new-project
+### /mahou-new-project
 
 **What it does:** Initializes a new project with deep context gathering,
 producing PROJECT.md (project context, architecture, conventions, decisions
@@ -357,43 +381,43 @@ tracking).
 creates the project layer that all subsequent features reference.
 
 **Tools & access:** Full — `read, write, bash, grep, glob, agent`. Writes
-ONLY to `./.magic-pi/PROJECT.md` and `./.magic-pi/ROADMAP.md`.
+ONLY to `./.mahou/PROJECT.md` and `./.mahou/ROADMAP.md`.
 
 **Example:**
 
 ```text
-/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
+/mahou-new-project I want to build an e-commerce platform with React + Node + Postgres
 ```
 
-### /magic-init
+### /mahou-init
 
-**What it does:** Generates a codebase map (`./.magic-pi/map.md`) for an
+**What it does:** Generates a codebase map (`./.mahou/map.md`) for an
 existing project. Maps modules, responsibilities, dependencies, patterns,
 and entry points. Does NOT generate AGENTS.md files (preserves zero
 structural token cost).
 
 **When to use:** Once per existing codebase, before working on features in
-it. For new projects from scratch, use `/magic-new-project` instead.
+it. For new projects from scratch, use `/mahou-new-project` instead.
 
 **Tools & access:** Full — `read, write, bash, grep, glob, agent`. Writes
-ONLY to `./.magic-pi/map.md`.
+ONLY to `./.mahou/map.md`.
 
-### /magic-research
+### /mahou-research
 
 **What it does:** Internet-connected research using Yahoo/Bing search via
 the native `webfetch` tool. Three modes:
 
 - `--explore` (default): broad comparative research. Dispatches 3-5
   subagents in parallel, each fetching 2-3 pages. Returns a synthesized
-  brief saved to `./.magic-pi/research/<uuid>.md`.
+  brief saved to `./.mahou/research/<uuid>.md`.
 - `--diagnose`: narrow deep-dive. Dispatches 1 subagent for a specific
   question (3-5 pages). Returns a targeted answer saved to
-  `./.magic-pi/research/<uuid>.md`.
+  `./.mahou/research/<uuid>.md`.
 - `--lookup`: quick factual lookup. Direct fetch in main context (1 page,
   inline answer, no file saved).
 
-**When to use:** Before `/magic-brainstorm` to research approaches, or
-during `/magic-debug` to check how upstream code works.
+**When to use:** Before `/mahou-brainstorm` to research approaches, or
+during `/mahou-debug` to check how upstream code works.
 
 **Tools & access:** Full — `read, bash, grep, glob, agent, webfetch`.
 Heavy fetching happens inside isolated subagents (explore/diagnose) to keep
@@ -402,24 +426,24 @@ main context lean.
 **Examples:**
 
 ```text
-/magic-research --explore compare Drizzle vs Prisma for Postgres
-/magic-research --diagnose why does SQLite WAL mode cause lock errors
-/magic-research --lookup what port does Express default to
+/mahou-research --explore compare Drizzle vs Prisma for Postgres
+/mahou-research --diagnose why does SQLite WAL mode cause lock errors
+/mahou-research --lookup what port does Express default to
 ```
 
-### /magic-verify
+### /mahou-verify
 
 **What it does:** Verifies implementation against spec. Dispatches verifier
 subagents per UAT criterion, synthesizes verdicts, and produces a routing
-verdict: PASS, FIX_FORWARD (route to /magic-debug), or REPLAN (route to
-/magic-brainstorm).
+verdict: PASS, FIX_FORWARD (route to /mahou-debug), or REPLAN (route to
+/mahou-brainstorm).
 
-**When to use:** After `/magic-orchestrator` completes all tasks for a
+**When to use:** After `/mahou-orchestrator` completes all tasks for a
 feature. This is the gate between implementation and shipping.
 
 **Tools & access:** Read-only — `read, bash, grep, glob, agent`.
 
-### /magic-resume
+### /mahou-resume
 
 **What it does:** Restores session context after restart. Reads state.json,
 identifies the last in-progress task, runs git-diff reconciliation to detect
@@ -429,13 +453,13 @@ manual changes, and routes back to the orchestrator.
 
 **Tools & access:** Read-only — `read, bash, grep, glob`.
 
-### /magic-ship
+### /mahou-ship
 
 **What it does:** Pushes branch, creates PR with auto-generated body sourced
-from spec, plan, state, and verification report. Filters `.magic-pi/`
+from spec, plan, state, and verification report. Filters `.mahou/`
 planning artifacts from the PR diff.
 
-**When to use:** After `/magic-verify` returns PASS.
+**When to use:** After `/mahou-verify` returns PASS.
 
 **Tools & access:** Read-only + bash — `read, bash, grep, glob`.
 
@@ -443,58 +467,58 @@ planning artifacts from the PR diff.
 
 ### Debug a bug
 
-When something is broken, reach for `/magic-debug`. It runs the 4-phase
+When something is broken, reach for `/mahou-debug`. It runs the 4-phase
 discipline end-to-end — investigation, pattern analysis, hypothesis, fix, and
 hardening.
 
 ```text
-/magic-debug The auth tests are failing intermittently after the refactor
+/mahou-debug The auth tests are failing intermittently after the refactor
 ```
 
 ### Design and build a feature
 
-Start with `/magic-brainstorm` to design, write a spec, and produce an
-implementation plan. Once the plan is approved, run `/magic-orchestrator` to
+Start with `/mahou-brainstorm` to design, write a spec, and produce an
+implementation plan. Once the plan is approved, run `/mahou-orchestrator` to
 execute it task-by-task with two-stage review per task.
 
 ```text
-/magic-brainstorm I want to add a webhook system for real-time notifications
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md
+/mahou-brainstorm I want to add a webhook system for real-time notifications
+/mahou-orchestrator ./.mahou/plans/<uuid>.md
 ```
 
 ### Review existing code
 
-Run `/magic-review` on a scope to find verified issues. Confirmed correctness
-bugs go to `/magic-debug`; architecture findings needing design go to
-`/magic-brainstorm`; surgical fixes use the build agent.
+Run `/mahou-review` on a scope to find verified issues. Confirmed correctness
+bugs go to `/mahou-debug`; architecture findings needing design go to
+`/mahou-brainstorm`; surgical fixes use the build agent.
 
 ```text
-/magic-review src/services/payment/
+/mahou-review src/services/payment/
 ```
 
 ### Build a whole system from scratch
 
-Start with `/magic-new-project` to create the project layer, then
+Start with `/mahou-new-project` to create the project layer, then
 brainstorm/orchestrate/verify/ship each feature in dependency order.
 
 ```text
-/magic-new-project I want to build an e-commerce platform with React + Node + Postgres
-/magic-research --explore e-commerce architecture patterns
-/magic-brainstorm auth subsystem
-/magic-orchestrator ./.magic-pi/plans/<uuid>.md
-/magic-verify
-/magic-ship
-/magic-brainstorm product catalog  ← reads PROJECT.md + auth's spec
+/mahou-new-project I want to build an e-commerce platform with React + Node + Postgres
+/mahou-research --explore e-commerce architecture patterns
+/mahou-brainstorm auth subsystem
+/mahou-orchestrator ./.mahou/plans/<uuid>.md
+/mahou-verify
+/mahou-ship
+/mahou-brainstorm product catalog  ← reads PROJECT.md + auth's spec
 ... repeat for each feature in ROADMAP build order ...
 ```
 
 ### Feedback loop (when verify finds issues)
 
 ```text
-/magic-verify
-  → PASS: /magic-ship
-  → FIX_FORWARD: /magic-debug (specific issue) → re-verify
-  → REPLAN: /magic-brainstorm (revises spec, appends revision log)
+/mahou-verify
+  → PASS: /mahou-ship
+  → FIX_FORWARD: /mahou-debug (specific issue) → re-verify
+  → REPLAN: /mahou-brainstorm (revises spec, appends revision log)
 ```
 
 ## Architecture
@@ -519,16 +543,16 @@ These rules must not be violated by any command or reference:
 8. **Append-only specs** — replan appends revision log, doesn't overwrite
 9. **Project layer above feature layer** — PROJECT.md + ROADMAP.md link features
    into a coherent system
-10. **No AGENTS.md auto-generation** — `magic-init` produces `map.md` only
+10. **No AGENTS.md auto-generation** — `mahou-init` produces `map.md` only
 
 ### Artifact structure
 
 ```text
-.magic-pi/
+.mahou/
 ├── PROJECT.md          ← project context, architecture, conventions, decisions log
 ├── ROADMAP.md          ← feature breakdown, dependencies, build order, status
 ├── state.json          ← enriched session state (orchestrator, for resume)
-├── map.md              ← codebase map (from /magic-init, no AGENTS.md)
+├── map.md              ← codebase map (from /mahou-init, no AGENTS.md)
 ├── specs/              ← per-feature specs (linked from ROADMAP)
 ├── plans/              ← per-feature plans (linked from ROADMAP)
 ├── research/           ← research briefs (project-level + feature-level)
@@ -539,22 +563,22 @@ These rules must not be violated by any command or reference:
 ## Repository Structure
 
 ```text
-magic-pi-opencode/
+mahou/
 ├── install.ps1
 ├── install.sh
 ├── commands/
-│   ├── magic.md
-│   ├── magic-ask.md
-│   ├── magic-brainstorm.md
-│   ├── magic-debug.md
-│   ├── magic-init.md
-│   ├── magic-new-project.md
-│   ├── magic-orchestrator.md
-│   ├── magic-research.md
-│   ├── magic-resume.md
-│   ├── magic-review.md
-│   ├── magic-ship.md
-│   └── magic-verify.md
+│   ├── mahou.md
+│   ├── mahou-ask.md
+│   ├── mahou-brainstorm.md
+│   ├── mahou-debug.md
+│   ├── mahou-init.md
+│   ├── mahou-new-project.md
+│   ├── mahou-orchestrator.md
+│   ├── mahou-research.md
+│   ├── mahou-resume.md
+│   ├── mahou-review.md
+│   ├── mahou-ship.md
+│   └── mahou-verify.md
 ├── references/
 │   ├── code-quality-reviewer-prompt.md
 │   ├── condition-based-waiting.md

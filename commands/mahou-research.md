@@ -40,7 +40,7 @@ Everything after the flag is the research question.
    "Drizzle features and performance", "Prisma features and performance",
    "migration tooling comparison", "community and ecosystem comparison")
 3. **Dispatch 3-5 general subagents in parallel**, one per facet. Use the
-   template at `{{MAGIC_PI_HOME}}/references/research-prompt.md`. Each
+   template at `{{MAHOU_HOME}}/references/research-prompt.md`. Each
    subagent:
    - Fetches Yahoo search: `webfetch("https://search.yahoo.com/search?p=<url-encoded-facet>")`
    - Extracts top result URLs from the search results
@@ -49,20 +49,20 @@ Everything after the flag is the research question.
 4. **Synthesize** the subagent briefs into one research brief.
 5. **Generate a UUID** for the brief: `[guid]::NewGuid().ToString()` (PowerShell)
    or `python -c "import uuid; print(uuid.uuid4())"`.
-6. **Save** the brief to `./.magic-pi/research/<uuid>.md`.
+6. **Save** the brief to `./.mahou/research/<uuid>.md`.
 7. **Return** the brief to the main context (~500-1000 tokens).
 
 ### --diagnose mode (narrow, specific)
 
 1. **Parse the specific question** from $ARGUMENTS (strip the --diagnose flag).
 2. **Dispatch 1 general subagent** using the template at
-   `{{MAGIC_PI_HOME}}/references/research-prompt.md`. If the user provided
+   `{{MAHOU_HOME}}/references/research-prompt.md`. If the user provided
    specific URLs to investigate, include them in the subagent prompt.
    The subagent:
    - Fetches Yahoo search or specific URLs provided
    - Deep-dives into 3-5 pages (docs, issues, GitHub, Stack Overflow)
    - Returns a targeted answer + evidence + cited URLs
-3. **Generate a UUID** and **save** to `./.magic-pi/research/<uuid>.md`.
+3. **Generate a UUID** and **save** to `./.mahou/research/<uuid>.md`.
 4. **Return** the targeted answer to the main context.
 
 ### --lookup mode (quick, factual)
@@ -96,7 +96,7 @@ overhead.
   failing, notes the failed URL and continues with remaining pages. Returns
   partial results with the failure noted.
 - **All fetches fail:** Return "research unavailable: all sources failed to
-  load." Save the query to `./.magic-pi/research/<uuid>.md` so the user can
+  load." Save the query to `./.mahou/research/<uuid>.md` so the user can
   retry or research manually.
 - **Low-quality/irrelevant page:** Subagent notes in brief ("source appeared
   to be SEO spam, excluded from findings") and excludes from results.
@@ -110,5 +110,5 @@ overhead.
 </restrictions>
 
 <subagent_template>
-@{{MAGIC_PI_HOME}}/references/research-prompt.md
+@{{MAHOU_HOME}}/references/research-prompt.md
 </subagent_template>

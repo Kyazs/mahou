@@ -20,9 +20,9 @@ approaches, present a design, get approval, write a spec, then write a plan.
 
 <restrictions>
 - The codebase is read-only: never modify existing source files. You may ONLY
-  use `edit`/`write` on spec/plan documents under `./.magic-pi/specs/` and
-  `./.magic-pi/plans/` (creating new ones with `write`, or revising existing
-  ones with `edit`), and on `./.magic-pi/ROADMAP.md` for status updates.
+  use `edit`/`write` on spec/plan documents under `./.mahou/specs/` and
+  `./.mahou/plans/` (creating new ones with `write`, or revising existing
+  ones with `edit`), and on `./.mahou/ROADMAP.md` for status updates.
 - Bash is read-only: do not mutate the filesystem, install packages, push
   commits, or run long-running processes.
 </restrictions>
@@ -43,21 +43,21 @@ User's idea: $ARGUMENTS
 Complete in order:
 
 1. **Explore project context**:
-   a. Read `./.magic-pi/PROJECT.md` (project goal, tech stack, conventions,
+   a. Read `./.mahou/PROJECT.md` (project goal, tech stack, conventions,
       decisions) — if it doesn't exist, tell the user to run
-      /magic-new-project first (or proceed in feature-at-a-time mode for a
+      /mahou-new-project first (or proceed in feature-at-a-time mode for a
       one-off feature).
-   b. Read `./.magic-pi/ROADMAP.md` (which feature is this, what depends on
+   b. Read `./.mahou/ROADMAP.md` (which feature is this, what depends on
       it, what features are already done).
    c. Read specs of completed/prior features that this one depends on (from
       ROADMAP dependency list).
-   d. Read `./.magic-pi/research/*.md` briefs relevant to this feature.
-   e. Read `./.magic-pi/map.md` if it exists (codebase memory).
+   d. Read `./.mahou/research/*.md` briefs relevant to this feature.
+   e. Read `./.mahou/map.md` if it exists (codebase memory).
    f. Read relevant files, docs, and recent commits (`git log --oneline -20`,
       `git diff`). Understand the architecture before asking anything.
 
 1a. **UI detection** — if the feature involves a user interface:
-    @{{MAGIC_PI_HOME}}/references/ui-design.md
+    @{{MAHOU_HOME}}/references/ui-design.md
     Add UI discovery questions to step 3:
       - Purpose & context (who specifically, state of mind, success criteria)
       - Content & data (realistic ranges: min/typical/max, edge cases)
@@ -85,7 +85,7 @@ Complete in order:
 6. **Write the spec** -- once approved, generate a UUID (use
    `[guid]::NewGuid().ToString()` in PowerShell, or
    `python -c "import uuid; print(uuid.uuid4())"`, or `uuidgen` if available)
-   and write the spec to `./.magic-pi/specs/<uuid>.md`. Announce the path.
+   and write the spec to `./.mahou/specs/<uuid>.md`. Announce the path.
    Include: goal, context, design, components, data flow, error handling,
    testing approach, out-of-scope.
    **Adaptive depth:** When the request is clear and context pins
@@ -100,7 +100,7 @@ Complete in order:
    make them and re-run step 7. Only proceed once approved.
 
 9. **Write the implementation plan** -- read the writing reference below and
-   follow it. Write the plan to `./.magic-pi/plans/<uuid>.md` (same UUID).
+   follow it. Write the plan to `./.mahou/plans/<uuid>.md` (same UUID).
    Announce the path.
 
 10. **Plan self-review** -- run the self-review from the writing reference.
@@ -110,15 +110,15 @@ Complete in order:
 11. **User reviews plan** -- ask the user to review. If they request changes,
     make them and re-review. Only proceed once approved.
 
-12. **Update ROADMAP** -- update `./.magic-pi/ROADMAP.md`: set this feature's
+12. **Update ROADMAP** -- update `./.mahou/ROADMAP.md`: set this feature's
     status to `planned`, fill in the spec and plan paths.
 
-13. **Transition** -- tell the user to run `/magic-orchestrator` to execute the
+13. **Transition** -- tell the user to run `/mahou-orchestrator` to execute the
     plan via subagents, or use the build agent to implement directly.
 </checklist>
 
 <replan_support>
-If returning from /magic-verify with a REPLAN verdict:
+If returning from /mahou-verify with a REPLAN verdict:
 - Read the existing spec (including any revision log).
 - Read the verify report (what failed and why).
 - Append to the spec's revision log (round N+1). Do NOT overwrite round N.
@@ -130,10 +130,10 @@ If returning from /magic-verify with a REPLAN verdict:
 </replan_support>
 
 <error_handling>
-- **PROJECT.md doesn't exist:** Tell user to run /magic-new-project first (or
+- **PROJECT.md doesn't exist:** Tell user to run /mahou-new-project first (or
   proceed in feature-at-a-time mode for a one-off feature).
 - **Prior dependent spec missing:** If ROADMAP says this feature depends on
-  another feature, but that feature's spec doesn't exist in ./.magic-pi/specs/,
+  another feature, but that feature's spec doesn't exist in ./.mahou/specs/,
   flag the inconsistency. Ask the user to verify the ROADMAP or brainstorm the
   dependency first.
 - **User rejects design 3+ times:** Stop proposing new designs. Ask "what's
@@ -160,5 +160,5 @@ If returning from /magic-verify with a REPLAN verdict:
 </existing_codebases>
 
 <writing_reference>
-@{{MAGIC_PI_HOME}}/references/writing.md
+@{{MAHOU_HOME}}/references/writing.md
 </writing_reference>

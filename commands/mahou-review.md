@@ -28,12 +28,12 @@ Use when the user asks you to review existing code: a module, feature, directory
 service, pull request, or concept.
 
 If the request is NOT a review, tell the user to run:
-- `/magic-debug` to root-cause a specific bug
-- `/magic-brainstorm` for design to spec to plan
-- `/magic-ask` to explain code
+- `/mahou-debug` to root-cause a specific bug
+- `/mahou-brainstorm` for design to spec to plan
+- `/mahou-ask` to explain code
 - Use the build agent for implementation
 
-REVIEW is about *finding issues across a scope*; `/magic-debug` is about
+REVIEW is about *finding issues across a scope*; `/mahou-debug` is about
 *root-causing one specific symptom*. If the user brings a single concrete bug,
 suggest debug. If they bring a scope, stay here.
 </when_to_use>
@@ -46,7 +46,7 @@ Two phases use subagents:
   questions concurrently. NEVER dispatch general or other mutating subagent
   types during discovery.
 - **Phase 3 (Verification):** dispatch **general** subagents (one per issue)
-  using the template at `{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md`.
+  using the template at `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
   Verifiers are read-only by instruction. Batch multiple verifiers in a single
   message so they run concurrently.
 
@@ -74,7 +74,7 @@ reporting without verification (skipping Phase 3) ships false positives.
    what DEPENDS ON IT?
 1a. **UI detection** — if the scope contains UI surfaces (components, pages,
     styles, templates, HTML/CSS files):
-    @{{MAGIC_PI_HOME}}/references/ui-critique.md
+    @{{MAHOU_HOME}}/references/ui-critique.md
     Phase 3 will use two-assessment synthesis for UI issues:
       Assessment A: design review (Nielsen heuristics + cognitive load)
       Assessment B: code inspection (interaction states, accessibility, drift)
@@ -122,7 +122,7 @@ For EACH issue, spawn an independent verification subagent:
 
 - Receives ONLY its single issue -- not the full triage list.
 - Dispatched with `subagent_type: "general"` using the template at
-  `{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md`.
+  `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
 - Read-only by instruction (template forbids edit/write).
 - Starts neutral, decides based on evidence.
 
@@ -171,9 +171,9 @@ systemic patterns.
   potentially cause issues."
 - **Do NOT speculate beyond what the code actually does.**
 - **No nitpicks.** Style, formatting, naming are out of scope.
-- **No fixes.** You report. The user takes confirmed issues to `/magic-debug`
+- **No fixes.** You report. The user takes confirmed issues to `/mahou-debug`
   (correctness bugs) or the build agent (surgical fixes) or
-  `/magic-brainstorm` (architecture findings needing design).
+  `/mahou-brainstorm` (architecture findings needing design).
 </rules>
 
 <red_flags>
@@ -183,9 +183,9 @@ systemic patterns.
   verifier decide.
 - Adding style/nits to pad the report -> STOP, they hide signal.
 - Fixing an issue you just confirmed -> STOP, you're in the wrong command. Run
-  `/magic-debug` or use the build agent to fix.
+  `/mahou-debug` or use the build agent to fix.
 </red_flags>
 
 <verifier_template>
-@{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md
+@{{MAHOU_HOME}}/references/issue-verifier-prompt.md
 </verifier_template>

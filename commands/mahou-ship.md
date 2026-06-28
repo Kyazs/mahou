@@ -1,5 +1,5 @@
 ---
-description: "Push branch, create PR with auto-generated body, filter .magic-pi/ artifacts"
+description: "Push branch, create PR with auto-generated body, filter .mahou/ artifacts"
 argument-hint: "[spec uuid or feature name from ROADMAP]"
 tools:
   read: true
@@ -11,7 +11,7 @@ tools:
 <objective>
 Ship completed work: push the branch, create a PR with an auto-generated
 body sourced from the spec, plan, state, and verification report. Filter
-.magic-pi/ planning artifacts from the PR diff so reviewers see only code
+.mahou/ planning artifacts from the PR diff so reviewers see only code
 changes.
 </objective>
 
@@ -21,10 +21,10 @@ current branch)
 </context>
 
 <when_to_use>
-Use after /magic-verify returns PASS. This is the final step in the feature
+Use after /mahou-verify returns PASS. This is the final step in the feature
 build cycle.
 
-If verification hasn't passed, tell the user to run /magic-verify first.
+If verification hasn't passed, tell the user to run /mahou-verify first.
 </when_to_use>
 
 <process>
@@ -43,12 +43,12 @@ user and stop.
 
 Read the following (if they exist) to build the PR body:
 
-1. **Spec** (`./.magic-pi/specs/<uuid>.md`) — extract the goal and key design
+1. **Spec** (`./.mahou/specs/<uuid>.md`) — extract the goal and key design
    decisions
-2. **Plan** (`./.magic-pi/plans/<uuid>.md`) — extract task count and names
-3. **state.json** (`./.magic-pi/state.json`) — extract completed task count,
+2. **Plan** (`./.mahou/plans/<uuid>.md`) — extract task count and names
+3. **state.json** (`./.mahou/state.json`) — extract completed task count,
    commit SHAs, review loop counts, any concerns
-4. **Verify report** (`./.magic-pi/verify/<uuid>.md`) — extract verification
+4. **Verify report** (`./.mahou/verify/<uuid>.md`) — extract verification
    verdict and evidence
 
 If $ARGUMENTS is a UUID, use it to find the files. If it's a feature name,
@@ -87,12 +87,12 @@ Construct the PR body:
 [Any concerns from state.json, any advisory notes from verify report]
 ```
 
-### Phase 4: Filter .magic-pi/ Artifacts
+### Phase 4: Filter .mahou/ Artifacts
 
-When creating the PR, ensure `.magic-pi/` directory contents are not included
+When creating the PR, ensure `.mahou/` directory contents are not included
 in the PR diff. These are planning artifacts, not code.
 
-Check if `.magic-pi/` is in `.gitignore`. If not, note this to the user —
+Check if `.mahou/` is in `.gitignore`. If not, note this to the user —
 they may want to add it. The PR should still be created; the filtering is
 about what reviewers see, not what's committed.
 
@@ -130,10 +130,10 @@ Update ROADMAP.md: feature status → `done`.
 - **`gh` CLI not installed:** Detect by running `gh --version`. If it fails,
   tell the user to install GitHub CLI. Provide the manual commands:
   `git push -u origin <branch>` and instructions to create the PR manually
-  via GitHub web UI. Save the PR body to `./.magic-pi/pr-body.md` for
+  via GitHub web UI. Save the PR body to `./.mahou/pr-body.md` for
   copy-paste.
 - **PR creation fails (auth, network):** Save the PR body to
-  `./.magic-pi/pr-body.md` so the user can create the PR manually. Report the
+  `./.mahou/pr-body.md` so the user can create the PR manually. Report the
   error.
 - **PR already exists:** Update the existing PR's body instead of creating a
   new one.
@@ -151,5 +151,5 @@ Update ROADMAP.md: feature status → `done`.
 </restrictions>
 
 <references>
-@{{MAGIC_PI_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/references/git-workflow.md
 </references>

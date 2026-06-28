@@ -14,15 +14,15 @@ reconciliation to detect any manual changes, and routes back to the
 orchestrator to continue.
 
 This is the session-continuity command. Close opencode mid-orchestration,
-reopen, run /magic-resume, and you're back where you left off.
+reopen, run /mahou-resume, and you're back where you left off.
 </objective>
 
 <process>
 ### Phase 1: Load State
 
-1. Read `./.magic-pi/state.json`. If it doesn't exist:
+1. Read `./.mahou/state.json`. If it doesn't exist:
    - Tell the user "no active orchestration found."
-   - Suggest checking ROADMAP.md for project status: `read ./.magic-pi/ROADMAP.md`
+   - Suggest checking ROADMAP.md for project status: `read ./.mahou/ROADMAP.md`
    - Stop.
 
 2. Parse state.json. Extract:
@@ -84,7 +84,7 @@ Present to the user:
 ### Next Action
 
 Resume orchestration from Task 3:
-  /magic-orchestrator [plan path]
+  /mahou-orchestrator [plan path]
 
 The orchestrator will read state.json and continue from the in-progress task.
 ```
@@ -93,7 +93,7 @@ The orchestrator will read state.json and continue from the in-progress task.
 
 Tell the user to run:
 
-> `/magic-orchestrator [plan path]`
+> `/mahou-orchestrator [plan path]`
 
 The orchestrator reads state.json, identifies the in-progress task, and
 resumes from there (it doesn't restart from Task 1).
@@ -103,14 +103,14 @@ resumes from there (it doesn't restart from Task 1).
 - **state.json doesn't exist:** Tell user "no active orchestration found."
   Suggest checking ROADMAP.md.
 - **state.json references a plan file that no longer exists:** Flag "plan file
-  missing." Suggest re-running /magic-brainstorm or checking git history
-  (`git log --oneline -- ./.magic-pi/plans/`).
+  missing." Suggest re-running /mahou-brainstorm or checking git history
+  (`git log --oneline -- ./.mahou/plans/`).
 - **state.json is invalid JSON:** Flag the parse error. Suggest checking the
   file or re-running the orchestrator (which will recreate state.json).
 - **HEAD moved backwards:** Flag and ask user to confirm before proceeding.
   Don't auto-reset.
 - **No in-progress task (all complete or all pending):** If all complete,
-  suggest /magic-verify. If all pending, suggest /magic-orchestrator from
+  suggest /mahou-verify. If all pending, suggest /mahou-orchestrator from
   the beginning.
 </error_handling>
 
@@ -122,5 +122,5 @@ resumes from there (it doesn't restart from Task 1).
 </restrictions>
 
 <references>
-@{{MAGIC_PI_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/references/git-workflow.md
 </references>

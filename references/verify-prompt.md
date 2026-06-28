@@ -1,6 +1,6 @@
 # Verify Subagent Prompt Template
 
-Use this template when the magic-verify agent dispatches a verification
+Use this template when the mahou-verify agent dispatches a verification
 subagent for a single UAT criterion. One subagent per criterion — each is
 independent and starts neutral.
 
@@ -90,7 +90,7 @@ Task tool (general):
     Gap: <if FAIL: what's missing. Otherwise: n/a>
 ```
 
-## Notes for the controller (magic-verify agent)
+## Notes for the controller (mahou-verify agent)
 
 - Dispatch **one verifier per criterion**. Criteria are independent — batch
   multiple Task calls in a single message so they run concurrently.
@@ -99,9 +99,9 @@ Task tool (general):
 - The verifier must NOT see the full list of criteria — paste only its one
   criterion. Seeing other criteria biases the verdict.
 - Synthesize all verdicts into the final verdict:
-  - ALL PASS -> PASS (route to /magic-ship)
-  - Any FAIL that's an implementation bug -> FIX_FORWARD (route to /magic-debug)
+  - ALL PASS -> PASS (route to /mahou-ship)
+  - Any FAIL that's an implementation bug -> FIX_FORWARD (route to /mahou-debug)
   - Any FAIL that's a spec/plan assumption being wrong -> REPLAN (route to
-    /magic-brainstorm)
+    /mahou-brainstorm)
   - Any UNCLEAR -> note for manual verification, don't block unless critical
-- Write the full verification report to `./.magic-pi/verify/<uuid>.md`.
+- Write the full verification report to `./.mahou/verify/<uuid>.md`.

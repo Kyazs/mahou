@@ -1,6 +1,6 @@
 # Git Workflow Reference
 
-Loaded by all magic-pi commands that touch git, via @-include. This is the
+Loaded by all mahou commands that touch git, via @-include. This is the
 single source of truth for branch strategy, commit conventions, merge
 strategy, conflict resolution, and initial repository setup.
 
@@ -98,7 +98,7 @@ git commit -m "chore: verify tests pass"
 - All merges use `--no-ff` (no fast-forward) to preserve branch topology
 - Merge commit message format: `Merge feature/<name> into develop`
   (or `Merge hotfix/<name> into main`, `Merge release/v<version> into main`)
-- `magic-ship` creates PRs targeting `develop` for feature branches, `main`
+- `mahou-ship` creates PRs targeting `develop` for feature branches, `main`
   for hotfix/release branches
 - After merge, delete the source branch: `git branch -d feature/<name>`
 
@@ -133,33 +133,33 @@ When a merge or rebase produces conflicts:
 
 ## .gitignore Management
 
-The `.magic-pi/` directory contains planning artifacts, not code. It should
+The `.mahou/` directory contains planning artifacts, not code. It should
 be gitignored:
 
 ```gitignore
-.magic-pi/
+.mahou/
 ```
 
-If `.magic-pi/` is already tracked but should be gitignored, add it to
+If `.mahou/` is already tracked but should be gitignored, add it to
 `.gitignore` and remove from tracking:
 
 ```bash
-git rm -r --cached .magic-pi/
-git commit -m "chore(core): gitignore .magic-pi planning artifacts"
+git rm -r --cached .mahou/
+git commit -m "chore(core): gitignore .mahou planning artifacts"
 ```
 
 ## Initial Repository Setup
 
-When initializing a new project (`magic-new-project`), ensure:
+When initializing a new project (`mahou-new-project`), ensure:
 
 1. `main` branch exists — if not, create it: `git checkout -b main`
 2. `develop` branch exists — if not, create it from `main`:
    `git checkout -b develop`
-3. `.gitignore` includes `.magic-pi/` — add the line if missing
+3. `.gitignore` includes `.mahou/` — add the line if missing
 4. User is on `develop` before routing to brainstorm — switch if needed:
    `git checkout develop`
 
 If the repository doesn't exist yet, tell the user to run `git init` first.
 
 If the user doesn't want git, proceed without it — but note that
-`magic-ship` (PR creation) won't work without git.
+`mahou-ship` (PR creation) won't work without git.

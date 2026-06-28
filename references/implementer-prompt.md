@@ -1,7 +1,7 @@
 # Implementer Subagent Prompt Template
 
-Use this template when the magic-orchestrator agent dispatches an implementer
-subagent for one task from a plan at `./.magic-pi/plans/<uuid>.md`.
+Use this template when the mahou-orchestrator agent dispatches an implementer
+subagent for one task from a plan at `./.mahou/plans/<uuid>.md`.
 
 The controller pastes the full task text into the prompt -- the subagent never
 reads the plan file. This keeps the subagent focused and preserves the
@@ -22,7 +22,7 @@ Task tool (general):
 
     [Scene-setting: where this task fits in the plan, what earlier tasks
     produced that this one depends on, architectural context, and the spec at
-    ./.magic-pi/specs/<uuid>.md if the subagent needs the broader
+    ./.mahou/specs/<uuid>.md if the subagent needs the broader
     design. Provide only what this task needs -- do not dump the whole plan.]
 
     ## Before You Begin

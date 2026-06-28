@@ -1,6 +1,6 @@
 # Research Subagent Prompt Template
 
-Use this template when the magic-research agent dispatches a research subagent
+Use this template when the mahou-research agent dispatches a research subagent
 for `--explore` or `--diagnose` modes. The subagent fetches web pages, distills
 them, and returns a brief — NOT raw HTML.
 
@@ -78,7 +78,7 @@ Task tool (general):
     - You are READ-ONLY. Do not edit, write, or mutate any file.
 ```
 
-## Notes for the controller (magic-research agent)
+## Notes for the controller (mahou-research agent)
 
 - For `--explore` mode: dispatch 3-5 of these subagents in parallel, each with
   a different facet of the research question. Synthesize their briefs into one
@@ -87,7 +87,7 @@ Task tool (general):
   relevant starting URLs if known.
 - For `--lookup` mode: do NOT use this template. Fetch directly in the main
   context (1 page, inline answer, no subagent).
-- Save the synthesized brief to `./.magic-pi/research/<uuid>.md` (for explore
+- Save the synthesized brief to `./.mahou/research/<uuid>.md` (for explore
   and diagnose modes only; lookup mode returns inline and saves nothing).
 - Generate the UUID with `[guid]::NewGuid().ToString()` (PowerShell) or
   `python -c "import uuid; print(uuid.uuid4())"`.

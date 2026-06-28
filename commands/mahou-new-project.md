@@ -16,7 +16,7 @@ Initialize a new project through deep context gathering. Produces PROJECT.md
 (feature breakdown, dependencies, build order, status tracking).
 
 This is the project layer that sits above the feature layer. Every subsequent
-/magic-brainstorm reads PROJECT.md and ROADMAP.md to stay consistent across
+/mahou-brainstorm reads PROJECT.md and ROADMAP.md to stay consistent across
 features.
 </objective>
 
@@ -76,7 +76,7 @@ whether to force a single-feature plan or reconsider the scope.
 
 ### Phase 4: Write PROJECT.md
 
-Write to `./.magic-pi/PROJECT.md`:
+Write to `./.mahou/PROJECT.md`:
 
 ```markdown
 # Project: [Name]
@@ -106,12 +106,12 @@ Write to `./.magic-pi/PROJECT.md`:
 
 ### Phase 5: Write ROADMAP.md
 
-Write to `./.magic-pi/ROADMAP.md`:
+Write to `./.mahou/ROADMAP.md`:
 
 ```markdown
 # Project Roadmap: [Name]
 
-**Project:** ./.magic-pi/PROJECT.md
+**Project:** ./.mahou/PROJECT.md
 **Started:** [date]
 **Status:** In Progress (0/N features complete)
 
@@ -139,8 +139,8 @@ Write to `./.magic-pi/ROADMAP.md`:
 
 Tell the user:
 
-> Project initialized. PROJECT.md and ROADMAP.md written to `./.magic-pi/`.
-> Run `/magic-brainstorm [first feature name]` to start designing the first
+> Project initialized. PROJECT.md and ROADMAP.md written to `./.mahou/`.
+> Run `/mahou-brainstorm [first feature name]` to start designing the first
 > feature.
 </process>
 
@@ -150,16 +150,16 @@ Tell the user:
 - **Can't decompose (single monolith):** Flag it. Ask whether to force a
   single-feature plan or reconsider scope.
 - **User cancels mid-interview:** Save partial PROJECT.md with an "incomplete"
-  marker so /magic-brainstorm or a later /magic-new-project can continue.
+  marker so /mahou-brainstorm or a later /mahou-new-project can continue.
 </error_handling>
 
 <restrictions>
-- This command writes ONLY to `./.magic-pi/PROJECT.md` and
-  `./.magic-pi/ROADMAP.md`. It does not touch the codebase.
+- This command writes ONLY to `./.mahou/PROJECT.md` and
+  `./.mahou/ROADMAP.md`. It does not touch the codebase.
 - Do NOT generate AGENTS.md files — opencode auto-reads them, which would
   create permanent per-prompt token cost.
 </restrictions>
 
 <references>
-@{{MAGIC_PI_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/references/git-workflow.md
 </references>

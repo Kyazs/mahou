@@ -1,6 +1,6 @@
 # Code Quality Reviewer Prompt Template
 
-Use this template when the magic-orchestrator agent dispatches a code quality
+Use this template when the mahou-orchestrator agent dispatches a code quality
 reviewer subagent. **Only dispatch after spec compliance review passes.**
 
 **Purpose:** Verify the implementation is well-built -- clean, tested, and
@@ -19,7 +19,7 @@ Task tool (general):
 
     DESCRIPTION: [one-line task summary, from the implementer's report]
     REQUIREMENTS: [full task text from the plan, or "Task N from
-      ./.magic-pi/plans/<uuid>.md" if the reviewer needs to look
+      ./.mahou/plans/<uuid>.md" if the reviewer needs to look
       up context -- but prefer pasting the task text]
     BASE_SHA: [commit SHA before this task]
     HEAD_SHA: [commit SHA after this task]

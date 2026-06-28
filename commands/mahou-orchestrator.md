@@ -1,6 +1,6 @@
 ---
 description: "Execute a plan task-by-task via subagents with two-stage review"
-argument-hint: "[path to plan file, e.g. ./.magic-pi/plans/<uuid>.md]"
+argument-hint: "[path to plan file, e.g. ./.mahou/plans/<uuid>.md]"
 tools:
   read: true
   bash: true
@@ -17,7 +17,7 @@ quality review.** This is the subagent-driven-development discipline.
 You do NOT implement directly -- you delegate. You are read-only: no `edit` or
 `write` tools are available. Subagents you dispatch handle the writes and
 commits.
-   You MAY write to `./.magic-pi/state.json` and `./.magic-pi/ROADMAP.md` via
+   You MAY write to `./.mahou/state.json` and `./.mahou/ROADMAP.md` via
    bash commands (e.g., `Set-Content`, `echo >`). These are metadata files,
    not source code. You may NOT use `edit` or `write` tools on source files.
 </objective>
@@ -38,11 +38,11 @@ User's plan: $ARGUMENTS
 </context>
 
 <when_to_use>
-Use when you have an implementation plan (typically from `/magic-brainstorm`,
-saved at `./.magic-pi/plans/<uuid>.md`) and the tasks are mostly independent.
+Use when you have an implementation plan (typically from `/mahou-brainstorm`,
+saved at `./.mahou/plans/<uuid>.md`) and the tasks are mostly independent.
 
 If the work is a single focused change, tell the user to use the build agent
-instead. If there's no plan, tell them to run `/magic-brainstorm` first.
+instead. If there's no plan, tell them to run `/mahou-brainstorm` first.
 </when_to_use>
 
 <process>
@@ -53,13 +53,13 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
    - The `Integration check interval` from the plan header (default: 3)
    - The `Dependency graph` from the plan header (if present)
 2. **Read project context (if exists):**
-   - `./.magic-pi/map.md` — codebase memory. Include relevant portions in
+   - `./.mahou/map.md` — codebase memory. Include relevant portions in
      implementer context.
-   - `./.magic-pi/models.json` — model routing config (maps task categories
+   - `./.mahou/models.json` — model routing config (maps task categories
      to model IDs). If present, use it for model selection.
-   - `./.magic-pi/PROJECT.md` — project conventions. Include relevant
+   - `./.mahou/PROJECT.md` — project conventions. Include relevant
      conventions in implementer context.
-3. **Initialize state.** Create or reset `./.magic-pi/state.json` with:
+3. **Initialize state.** Create or reset `./.mahou/state.json` with:
    - plan path, spec path, started_at timestamp
    - config: { parallel, integration_check_interval }
    - tasks: all pending, no SHAs yet
@@ -74,7 +74,7 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
    - Capture the **BASE_SHA** (`git rev-parse HEAD`) before dispatching.
    - Write state.json: mark task as `in_progress`, record `time_started`.
    - Dispatch an **implementer subagent** using the template at
-     `{{MAGIC_PI_HOME}}/references/implementer-prompt.md`. Paste the full task
+     `{{MAHOU_HOME}}/references/implementer-prompt.md`. Paste the full task
      text and scene-setting context. Pick the model per complexity.
    - If the implementer asks questions, **answer them** and re-dispatch.
     - Handle the implementer's status (see below).
@@ -88,10 +88,10 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
       - This is condition-gated: only fires for external unknowns, not for
         plan/spec ambiguities (those are answered from the plan).
     - Dispatch a **spec compliance reviewer** using
-     `{{MAGIC_PI_HOME}}/references/spec-reviewer-prompt.md`. Loop until it
+     `{{MAHOU_HOME}}/references/spec-reviewer-prompt.md`. Loop until it
      passes.
    - Dispatch a **code quality reviewer** using
-     `{{MAGIC_PI_HOME}}/references/code-quality-reviewer-prompt.md`, passing
+     `{{MAHOU_HOME}}/references/code-quality-reviewer-prompt.md`, passing
       BASE_SHA and HEAD_SHA. Loop until Approved.
     - **Record review loop counts in state.json:** After each spec compliance
       loop, record `spec_compliance_loops`. After each code quality loop,
@@ -105,12 +105,12 @@ instead. If there's no plan, tell them to run `/magic-brainstorm` first.
    - **Integration check (every N tasks):** After every N tasks (N from the
      plan header, default 3), dispatch an integration reviewer subagent
      using the template at
-     `{{MAGIC_PI_HOME}}/references/integration-reviewer-prompt.md`.
+     `{{MAHOU_HOME}}/references/integration-reviewer-prompt.md`.
      Pass BASE_SHA (from before the first task) and current HEAD_SHA.
      The reviewer checks: interfaces between tasks still align, earlier
      tests still pass, build is green.
      - If PASS: continue to next task.
-     - If FAIL: STOP. Route to /magic-debug for targeted fix at the seam.
+     - If FAIL: STOP. Route to /mahou-debug for targeted fix at the seam.
        Do not proceed until integration is restored.
      - Record the result in state.json under `integration_checks`.
 4. **After all tasks:** dispatch a **final code reviewer** for the entire
@@ -137,7 +137,7 @@ reasoning -> more capable model. Too large -> break into smaller pieces. Plan
 wrong -> escalate to human.
 
 **BLOCKED 3+ times on the same task:** Stop. Flag "the plan may be wrong for
-this task." Route to /magic-brainstorm to replan the affected task. Do not
+this task." Route to /mahou-brainstorm to replan the affected task. Do not
 keep retrying with the same approach.
 
 **Spec compliance review loops 3+ times:** Flag "the spec may be ambiguous for
@@ -171,7 +171,7 @@ Never ignore an escalation or force the same model to retry without changes.
 </red_flags>
 
 <integration>
-- **Upstream:** `/magic-brainstorm` produces the spec and plan that this command
+- **Upstream:** `/mahou-brainstorm` produces the spec and plan that this command
   executes.
 - **Downstream:** Small follow-ups go to the build agent. After all tasks pass
   review, finish the branch (merge, PR, or cleanup).
@@ -179,13 +179,13 @@ Never ignore an escalation or force the same model to retry without changes.
 </integration>
 
 <prompt_templates>
-@{{MAGIC_PI_HOME}}/references/implementer-prompt.md
+@{{MAHOU_HOME}}/references/implementer-prompt.md
 
-@{{MAGIC_PI_HOME}}/references/spec-reviewer-prompt.md
+@{{MAHOU_HOME}}/references/spec-reviewer-prompt.md
 
-@{{MAGIC_PI_HOME}}/references/code-quality-reviewer-prompt.md
+@{{MAHOU_HOME}}/references/code-quality-reviewer-prompt.md
 
-@{{MAGIC_PI_HOME}}/references/integration-reviewer-prompt.md
+@{{MAHOU_HOME}}/references/integration-reviewer-prompt.md
 
-@{{MAGIC_PI_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/references/git-workflow.md
 </prompt_templates>

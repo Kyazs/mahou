@@ -2,9 +2,9 @@
 set -euo pipefail
 
 #
-# Install magic-pi-opencode commands into opencode's global config.
+# Install mahou commands into opencode's global config.
 # Copies command files to ~/.config/opencode/command/ and reference files to
-# ~/.config/opencode/magic-pi/references/. Replaces {{MAGIC_PI_HOME}} in
+# ~/.config/opencode/mahou/references/. Replaces {{MAHOU_HOME}} in
 # command files with the resolved absolute path.
 #
 # Usage: ./install.sh [--uninstall]
@@ -12,20 +12,20 @@ set -euo pipefail
 
 CONFIG_DIR="${HOME}/.config/opencode"
 COMMAND_DIR="${CONFIG_DIR}/command"
-MAGIC_PI_DIR="${CONFIG_DIR}/magic-pi"
-REFS_DIR="${MAGIC_PI_DIR}/references"
+MAHOU_DIR="${CONFIG_DIR}/mahou"
+REFS_DIR="${MAHOU_DIR}/references"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_COMMANDS="${SCRIPT_DIR}/commands"
 SOURCE_REFS="${SCRIPT_DIR}/references"
 
 COMMAND_FILES=(
-    "magic.md"
-    "magic-ask.md"
-    "magic-debug.md"
-    "magic-review.md"
-    "magic-brainstorm.md"
-    "magic-orchestrator.md"
+    "mahou.md"
+    "mahou-ask.md"
+    "mahou-debug.md"
+    "mahou-review.md"
+    "mahou-brainstorm.md"
+    "mahou-orchestrator.md"
 )
 
 UNINSTALL=false
@@ -34,7 +34,7 @@ if [[ "${1:-}" == "--uninstall" || "${1:-}" == "-u" ]]; then
 fi
 
 if $UNINSTALL; then
-    echo "Uninstalling magic-pi-opencode..."
+    echo "Uninstalling mahou..."
 
     for f in "${COMMAND_FILES[@]}"; do
         target="${COMMAND_DIR}/${f}"
@@ -49,11 +49,11 @@ if $UNINSTALL; then
         echo "  Removed references: $REFS_DIR"
     fi
 
-    if [[ -d "$MAGIC_PI_DIR" ]]; then
-        remaining=$(find "$MAGIC_PI_DIR" -mindepth 1 2>/dev/null | head -1)
+    if [[ -d "$MAHOU_DIR" ]]; then
+        remaining=$(find "$MAHOU_DIR" -mindepth 1 2>/dev/null | head -1)
         if [[ -z "$remaining" ]]; then
-            rmdir "$MAGIC_PI_DIR"
-            echo "  Removed empty: $MAGIC_PI_DIR"
+            rmdir "$MAHOU_DIR"
+            echo "  Removed empty: $MAHOU_DIR"
         fi
     fi
 
@@ -63,7 +63,7 @@ fi
 
 # --- Install ---
 
-echo "Installing magic-pi-opencode..."
+echo "Installing mahou..."
 
 mkdir -p "$COMMAND_DIR" "$REFS_DIR"
 
@@ -82,7 +82,7 @@ for f in "${COMMAND_FILES[@]}"; do
         continue
     fi
 
-    sed "s|{{MAGIC_PI_HOME}}|${MAGIC_PI_DIR}|g" "$src" > "$dst"
+    sed "s|{{MAHOU_HOME}}|${MAHOU_DIR}|g" "$src" > "$dst"
     echo "    Installed: $f"
 done
 

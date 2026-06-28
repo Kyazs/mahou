@@ -1,6 +1,6 @@
 # UI Design Reference
 
-Loaded by /magic-brainstorm via @-include ONLY when the feature involves a
+Loaded by /mahou-brainstorm via @-include ONLY when the feature involves a
 user interface. Non-UI features skip this entirely — zero token cost.
 
 Distilled from the impeccable design skill. Principles, not scripts.

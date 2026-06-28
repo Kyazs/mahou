@@ -14,9 +14,9 @@ Verify that an implementation meets its spec. Dispatches verifier subagents
 per UAT criterion, synthesizes their verdicts, and produces a routing
 verdict that closes the workflow loop:
 
-- PASS → proceed to /magic-ship or /magic-secure
-- FIX_FORWARD → route to /magic-debug (implementation bug, spec is right)
-- REPLAN → route to /magic-brainstorm (spec assumption was wrong)
+- PASS → proceed to /mahou-ship or /mahou-secure
+- FIX_FORWARD → route to /mahou-debug (implementation bug, spec is right)
+- REPLAN → route to /mahou-brainstorm (spec assumption was wrong)
 
 This is the feedback loop that prevents forward-marching against a broken
 spec.
@@ -28,18 +28,18 @@ ROADMAP)
 </context>
 
 <when_to_use>
-Use after /magic-orchestrator completes all tasks for a feature. This is the
+Use after /mahou-orchestrator completes all tasks for a feature. This is the
 gate between implementation and shipping.
 
 If the implementation hasn't been built yet, tell the user to run
-/magic-orchestrator first.
+/mahou-orchestrator first.
 </when_to_use>
 
 <process>
 ### Phase 1: Load Context
 
 1. **Resolve the target.** If $ARGUMENTS is a UUID, look for
-   `./.magic-pi/specs/<uuid>.md` and `./.magic-pi/plans/<uuid>.md`. If it's
+   `./.mahou/specs/<uuid>.md` and `./.mahou/plans/<uuid>.md`. If it's
    a path, use it directly. If it's a feature name, look it up in ROADMAP.md.
 2. **Read the spec** — extract UAT criteria / acceptance criteria / success
    criteria.
@@ -55,7 +55,7 @@ If the spec has no explicit UAT criteria, either:
 ### Phase 2: Dispatch Verifiers
 
 For each UAT criterion, dispatch a verifier subagent using the template at
-`{{MAGIC_PI_HOME}}/references/verify-prompt.md`. Dispatch in parallel (batch
+`{{MAHOU_HOME}}/references/verify-prompt.md`. Dispatch in parallel (batch
 multiple Task calls in a single message).
 
 Each verifier:
@@ -69,17 +69,17 @@ Each verifier:
 Collect all verifier verdicts and synthesize:
 
 - **ALL PASS** → `PASS`
-  - Route to /magic-ship (or /magic-secure if security-sensitive)
+  - Route to /mahou-ship (or /mahou-secure if security-sensitive)
   - Update ROADMAP.md: feature status → `verified`
 
 - **Any FAIL, and the failure is an implementation bug** (spec is correct,
   code is wrong) → `FIX_FORWARD`
-  - Route to /magic-debug with the specific failing criteria
+  - Route to /mahou-debug with the specific failing criteria
   - Do NOT route to brainstorm — the spec is right, the code is wrong
 
 - **Any FAIL, and the failure is a spec/plan assumption being wrong** (the
   spec assumed X but reality is Y) → `REPLAN`
-  - Route to /magic-brainstorm with the specific spec section to revise
+  - Route to /mahou-brainstorm with the specific spec section to revise
   - The brainstorm agent will append to the revision log, not overwrite
 
 - **Any UNCLEAR** → note for manual verification. If all others PASS, verdict
@@ -94,7 +94,7 @@ Collect all verifier verdicts and synthesize:
 ### Phase 4: Write Report
 
 Generate a UUID and write the verification report to
-`./.magic-pi/verify/<uuid>.md`:
+`./.mahou/verify/<uuid>.md`:
 
 ```markdown
 # Verification Report: [feature name]
@@ -115,9 +115,9 @@ Generate a UUID and write the verification report to
 
 ## Routing
 
-- [If PASS]: Run /magic-ship to create PR
-- [If FIX_FORWARD]: Run /magic-debug with: [specific failing criteria]
-- [If REPLAN]: Run /magic-brainstorm to revise: [spec section]
+- [If PASS]: Run /mahou-ship to create PR
+- [If FIX_FORWARD]: Run /mahou-debug with: [specific failing criteria]
+- [If REPLAN]: Run /mahou-brainstorm to revise: [spec section]
 
 ## Notes
 
@@ -147,11 +147,11 @@ Present the verdict and routing recommendation to the user.
 
 <restrictions>
 - You are read-only: no `edit` or `write` tools for source files. You may
-  ONLY write to `./.magic-pi/verify/<uuid>.md` and update ROADMAP.md.
-- Do NOT fix implementation bugs yourself. Route to /magic-debug.
-- Do NOT revise the spec yourself. Route to /magic-brainstorm.
+  ONLY write to `./.mahou/verify/<uuid>.md` and update ROADMAP.md.
+- Do NOT fix implementation bugs yourself. Route to /mahou-debug.
+- Do NOT revise the spec yourself. Route to /mahou-brainstorm.
 </restrictions>
 
 <verifier_template>
-@{{MAGIC_PI_HOME}}/references/verify-prompt.md
+@{{MAHOU_HOME}}/references/verify-prompt.md
 </verifier_template>
