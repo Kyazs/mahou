@@ -186,4 +186,6 @@ Never ignore an escalation or force the same model to retry without changes.
 @{{MAGIC_PI_HOME}}/references/code-quality-reviewer-prompt.md
 
 @{{MAGIC_PI_HOME}}/references/integration-reviewer-prompt.md
+
+@{{MAGIC_PI_HOME}}/references/git-workflow.md
 </prompt_templates>
