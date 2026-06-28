@@ -120,3 +120,7 @@ resumes from there (it doesn't restart from Task 1).
 - Do NOT auto-resolve manual change conflicts. Always ask the user.
 - Do NOT restart the orchestrator yourself. Route the user to run it.
 </restrictions>
+
+<references>
+@{{MAGIC_PI_HOME}}/references/git-workflow.md
+</references>
