@@ -19,14 +19,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_COMMANDS="${SCRIPT_DIR}/commands"
 SOURCE_REFS="${SCRIPT_DIR}/references"
 
-COMMAND_FILES=(
-    "mahou.md"
-    "mahou-ask.md"
-    "mahou-debug.md"
-    "mahou-review.md"
-    "mahou-brainstorm.md"
-    "mahou-orchestrator.md"
-)
+# Discover all mahou command files dynamically so new commands don't need installer updates
+COMMAND_FILES=("$SOURCE_COMMANDS"/mahou*.md)
 
 UNINSTALL=false
 if [[ "${1:-}" == "--uninstall" || "${1:-}" == "-u" ]]; then
@@ -36,12 +30,11 @@ fi
 if $UNINSTALL; then
     echo "Uninstalling mahou..."
 
-    for f in "${COMMAND_FILES[@]}"; do
-        target="${COMMAND_DIR}/${f}"
-        if [[ -f "$target" ]]; then
-            rm -f "$target"
-            echo "  Removed command: $f"
-        fi
+    for target in "${COMMAND_DIR}"/mahou*.md; do
+        [[ -f "$target" ]] || continue
+        f=$(basename "$target")
+        rm -f "$target"
+        echo "  Removed command: $f"
     done
 
     if [[ -d "$REFS_DIR" ]]; then
@@ -73,14 +66,10 @@ ref_count=$(find "$REFS_DIR" -type f | wc -l | tr -d ' ')
 echo "    $ref_count reference files installed to $REFS_DIR"
 
 echo "  Installing commands..."
-for f in "${COMMAND_FILES[@]}"; do
-    src="${SOURCE_COMMANDS}/${f}"
+for src in "${COMMAND_FILES[@]}"; do
+    [[ -f "$src" ]] || continue
+    f=$(basename "$src")
     dst="${COMMAND_DIR}/${f}"
-
-    if [[ ! -f "$src" ]]; then
-        echo "    SKIP (not found): $f"
-        continue
-    fi
 
     sed "s|{{MAHOU_HOME}}|${MAHOU_DIR}|g" "$src" > "$dst"
     echo "    Installed: $f"
