@@ -28,14 +28,8 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceCommands = Join-Path $ScriptDir "commands"
 $SourceRefs = Join-Path $ScriptDir "references"
 
-$CommandFiles = @(
-    "mahou.md",
-    "mahou-ask.md",
-    "mahou-debug.md",
-    "mahou-review.md",
-    "mahou-brainstorm.md",
-    "mahou-orchestrator.md"
-)
+# Discover all mahou command files dynamically so new commands don't need installer updates
+$CommandFiles = Get-ChildItem -Path $SourceCommands -Filter "mahou*.md" | Select-Object -ExpandProperty Name
 
 # Mahou home path with forward slashes for @-include compatibility
 $MahouHome = ($MahouDir -replace '\\', '/')
@@ -43,12 +37,10 @@ $MahouHome = ($MahouDir -replace '\\', '/')
 if ($Uninstall) {
     Write-Host "Uninstalling mahou..." -ForegroundColor Yellow
 
-    foreach ($f in $CommandFiles) {
-        $target = Join-Path $CommandDir $f
-        if (Test-Path $target) {
-            Remove-Item $target -Force
-            Write-Host "  Removed command: $f"
-        }
+    $installedCommands = Get-ChildItem -Path $CommandDir -Filter "mahou*.md" -ErrorAction SilentlyContinue
+    foreach ($cmd in $installedCommands) {
+        Remove-Item $cmd.FullName -Force
+        Write-Host "  Removed command: $($cmd.Name)"
     }
 
     if (Test-Path $RefsDir) {
