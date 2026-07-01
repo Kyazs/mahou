@@ -37,8 +37,8 @@ Use for ANY technical issue: test failures, bugs, unexpected behavior,
 performance problems, build failures, integration issues.
 
 If the request is NOT a debugging task, tell the user to run:
-- `/magic-brainstorm` for design to spec to plan
-- `/magic-ask` to explain code
+- `/mahou-brainstorm` for design to spec to plan
+- `/mahou-ask` to explain code
 - Use the build agent for implementation
 </when_to_use>
 
@@ -140,20 +140,22 @@ If you catch yourself thinking:
 <integration>
 - If the fix is small and surgical -> finish it here.
 - If the fix requires broad multi-file changes or a design decision -> run
-  `/magic-brainstorm` to design first, then implement.
+  `/mahou-brainstorm` to design first, then implement.
 - If the fix decomposes into several independent tasks -> run
-  `/magic-orchestrator` to execute task-by-task.
+  `/mahou-orchestrator` to execute task-by-task.
 - Before claiming the bug is fixed, run the failing repro and the full relevant
   test suite. Evidence before assertions, always.
 </integration>
 
 <references>
-@{{MAGIC_PI_HOME}}/references/root-cause-tracing.md
+@{{MAHOU_HOME}}/references/root-cause-tracing.md
 
-@{{MAGIC_PI_HOME}}/references/defense-in-depth.md
+@{{MAHOU_HOME}}/references/defense-in-depth.md
 
-@{{MAGIC_PI_HOME}}/references/condition-based-waiting.md
+@{{MAHOU_HOME}}/references/condition-based-waiting.md
+
+@{{MAHOU_HOME}}/references/git-workflow.md
 
 The bisection script for test polluters is at
-`{{MAGIC_PI_HOME}}/references/find-polluter.sh`.
+`{{MAHOU_HOME}}/references/find-polluter.sh`.
 </references>

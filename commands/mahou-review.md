@@ -28,12 +28,12 @@ Use when the user asks you to review existing code: a module, feature, directory
 service, pull request, or concept.
 
 If the request is NOT a review, tell the user to run:
-- `/magic-debug` to root-cause a specific bug
-- `/magic-brainstorm` for design to spec to plan
-- `/magic-ask` to explain code
+- `/mahou-debug` to root-cause a specific bug
+- `/mahou-brainstorm` for design to spec to plan
+- `/mahou-ask` to explain code
 - Use the build agent for implementation
 
-REVIEW is about *finding issues across a scope*; `/magic-debug` is about
+REVIEW is about *finding issues across a scope*; `/mahou-debug` is about
 *root-causing one specific symptom*. If the user brings a single concrete bug,
 suggest debug. If they bring a scope, stay here.
 </when_to_use>
@@ -46,7 +46,7 @@ Two phases use subagents:
   questions concurrently. NEVER dispatch general or other mutating subagent
   types during discovery.
 - **Phase 3 (Verification):** dispatch **general** subagents (one per issue)
-  using the template at `{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md`.
+  using the template at `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
   Verifiers are read-only by instruction. Batch multiple verifiers in a single
   message so they run concurrently.
 
@@ -72,12 +72,20 @@ reporting without verification (skipping Phase 3) ships false positives.
    relevant sections.
 4. **Identify key responsibilities.** What does this code DO, DEPEND ON, and
    what DEPENDS ON IT?
+1a. **UI detection** — if the scope contains UI surfaces (components, pages,
+    styles, templates, HTML/CSS files):
+    @{{MAHOU_HOME}}/references/ui-critique.md
+    Phase 3 will use two-assessment synthesis for UI issues:
+      Assessment A: design review (Nielsen heuristics + cognitive load)
+      Assessment B: code inspection (interaction states, accessibility, drift)
+      Dispatch as separate subagents. Synthesize, don't concatenate.
+    If no UI surfaces in scope: skip this step entirely, zero cost.
 
 If you can't find relevant files for the scope, say so explicitly.
 
 ### Phase 2: Triage
 
-Scan all discovered files and list POTENTIAL issues across these four
+Scan all discovered files and list POTENTIAL issues across these
 categories only:
 
 1. **Correctness** — logic bugs, wrong assumptions, broken edge cases, race
@@ -88,6 +96,14 @@ categories only:
    missing indexes, quadratic algorithms.
 4. **Architecture** — circular dependencies, god functions/modules, unclear
    responsibilities, tight coupling.
+5. **UI/UX** (only when ui-critique reference was loaded in step 1a) —
+   missing interaction states (default/hover/focus/active/disabled/loading/
+   error/success), cognitive load violations (≤4 items per group, ≤4 visible
+   options at decision point), AI slop patterns (side-stripe borders,
+   gradient text, glassmorphism-as-default, identical card grids, tracked
+   uppercase eyebrows), design system drift, accessibility failures (WCAG AA
+   contrast, keyboard navigation, ARIA labels, focus indicators). Score
+   against Nielsen heuristics (0-4 per heuristic, 40 total).
 
 **Do NOT include:** style, formatting, naming (unless misleading), minor
 suggestions, nits, or positive feedback.
@@ -106,11 +122,21 @@ For EACH issue, spawn an independent verification subagent:
 
 - Receives ONLY its single issue -- not the full triage list.
 - Dispatched with `subagent_type: "general"` using the template at
-  `{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md`.
+  `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
 - Read-only by instruction (template forbids edit/write).
 - Starts neutral, decides based on evidence.
 
 Dispatch verifiers in parallel: batch multiple Task calls in a single message.
+
+**UI issue verification (when ui-critique reference was loaded):**
+For UI/UX issues, use two-assessment synthesis instead of single-verifier:
+- Assessment A: design review subagent (evaluates Nielsen heuristics,
+  cognitive load, AI slop patterns)
+- Assessment B: code inspection subagent (checks interaction states in code,
+  accessibility attributes, design system token usage, drift classification)
+Dispatch as separate subagents. They must not see each other's output.
+Synthesize their findings: note where they agree, where B caught what A
+missed, and where findings are false positives.
 
 Each returns: **CONFIRMED** (real, with evidence) | **REFUTED** (doesn't exist,
 with reasoning) | **UNDETERMINED** (can't decide, what's missing).
@@ -145,9 +171,9 @@ systemic patterns.
   potentially cause issues."
 - **Do NOT speculate beyond what the code actually does.**
 - **No nitpicks.** Style, formatting, naming are out of scope.
-- **No fixes.** You report. The user takes confirmed issues to `/magic-debug`
+- **No fixes.** You report. The user takes confirmed issues to `/mahou-debug`
   (correctness bugs) or the build agent (surgical fixes) or
-  `/magic-brainstorm` (architecture findings needing design).
+  `/mahou-brainstorm` (architecture findings needing design).
 </rules>
 
 <red_flags>
@@ -157,9 +183,9 @@ systemic patterns.
   verifier decide.
 - Adding style/nits to pad the report -> STOP, they hide signal.
 - Fixing an issue you just confirmed -> STOP, you're in the wrong command. Run
-  `/magic-debug` or use the build agent to fix.
+  `/mahou-debug` or use the build agent to fix.
 </red_flags>
 
 <verifier_template>
-@{{MAGIC_PI_HOME}}/references/issue-verifier-prompt.md
+@{{MAHOU_HOME}}/references/issue-verifier-prompt.md
 </verifier_template>

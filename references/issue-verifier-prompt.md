@@ -1,6 +1,6 @@
 # Issue Verifier Prompt Template
 
-Use this template when the magic-review agent dispatches a verification subagent
+Use this template when the mahou-review agent dispatches a verification subagent
 for a single issue triaged in Phase 2. One subagent per issue -- each is
 independent and starts neutral.
 
@@ -79,7 +79,7 @@ Task tool (general):
     Impact: <if CONFIRMED: what goes wrong. Otherwise: n/a>
 ```
 
-## Notes for the controller (magic-review agent)
+## Notes for the controller (mahou-review agent)
 
 - Dispatch **one verifier per issue**. Issues are independent -- batch multiple
   Task calls in a single message so they run concurrently. This is the one

@@ -1,7 +1,7 @@
 # OS files
 .DS_Store
 Thumbs.db
-.magic-pi/
+.mahou/
 
 # Editor files
 *.swp
@@ -12,3 +12,8 @@ Thumbs.db
 
 # No secrets or machine-local state in this repo
 # (the install scripts write to ~/.config/opencode/ which is outside the repo)
+
+# Next.js landing page build artifacts
+landing/node_modules/
+landing/.next/
+landing/out/

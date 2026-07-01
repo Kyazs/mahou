@@ -1,6 +1,6 @@
 # Spec Compliance Reviewer Prompt Template
 
-Use this template when the magic-orchestrator agent dispatches a spec compliance
+Use this template when the mahou-orchestrator agent dispatches a spec compliance
 reviewer subagent after an implementer reports DONE (or DONE_WITH_CONCERNS that
 were addressed).
 

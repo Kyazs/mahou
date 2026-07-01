@@ -1,7 +1,7 @@
 # Writing Implementation Plans
 
-This is the writing reference bundled with magic-pi-opencode.
-It is invoked by the magic-brainstorm agent after the design spec is approved.
+This is the writing reference bundled with mahou.
+It is invoked by the mahou-brainstorm agent after the design spec is approved.
 
 ## Overview
 
@@ -18,9 +18,9 @@ toolset or problem domain, and doesn't know good test design very well.
 
 ## Inputs
 
-- **Spec:** `./.magic-pi/specs/<uuid>.md` (the approved design from the
+- **Spec:** `./.mahou/specs/<uuid>.md` (the approved design from the
   brainstorm agent's design phase -- read it first).
-- **Save plan to:** `./.magic-pi/plans/<uuid>.md` (same UUID as the spec, so
+- **Save plan to:** `./.mahou/plans/<uuid>.md` (same UUID as the spec, so
   spec and plan are linked).
 
 ## Scope Check
@@ -68,10 +68,10 @@ self-contained changes that make sense independently.
 
 > **For agentic workers:** Implement this plan task-by-task. Steps use checkbox
 > (`- [ ]`) syntax for tracking. In the build agent, work through tasks in order.
-> In the magic-orchestrator agent, dispatch a subagent per task and review
+> In the mahou-orchestrator agent, dispatch a subagent per task and review
 > between tasks.
 
-**Spec:** ./.magic-pi/specs/<uuid>.md
+**Spec:** ./.mahou/specs/<uuid>.md
 
 **Goal:** [One sentence describing what this builds]
 
@@ -79,8 +79,27 @@ self-contained changes that make sense independently.
 
 **Tech Stack:** [Key technologies/libraries]
 
+**Parallel:** false
+**Integration check interval:** 3
+
+**Dependency graph:**
+- Task 1: (none)
+- Task 2: (Task 1)
+- Task 3: (none)  ← independent, can parallelize
+- Task 4: (Task 1, Task 2)
+
 ---
 ```
+
+**New header fields:**
+- **Parallel:** `true` if tasks can be executed in parallel (requires
+  dependency graph with independent tasks). Default `false` (sequential).
+- **Integration check interval:** every N tasks, the orchestrator runs an
+  integration check (cumulative diff, interface alignment, earlier tests
+  pass, build green). Default 3.
+- **Dependency graph:** maps each task to its dependencies. Tasks with no
+  dependencies can be parallelized. Tasks with dependencies must wait for
+  their dependencies to complete.
 
 ## Task Structure
 
@@ -212,8 +231,8 @@ independent check. Do this when the plan is large or high-stakes.
 You are a plan document reviewer. Verify this plan is complete and ready for
 implementation.
 
-Plan to review: ./.magic-pi/plans/<uuid>.md
-Spec for reference: ./.magic-pi/specs/<uuid>.md
+Plan to review: ./.mahou/plans/<uuid>.md
+Spec for reference: ./.mahou/specs/<uuid>.md
 
 Check: completeness (TODOs, placeholders, missing steps), spec alignment (plan
 covers spec requirements, no major scope creep), task decomposition (clear
@@ -239,5 +258,5 @@ Address any blocking issues inline, then save the final plan.
 
 After the plan is saved and reviewed, return control to the brainstorm agent's
 flow: tell the user to review the plan, then switch to the build agent
-(`/agent build`) or the magic-orchestrator agent (`/agent magic-orchestrator`)
+(`/agent build`) or the mahou-orchestrator agent (`/agent mahou-orchestrator`)
 to implement.

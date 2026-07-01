@@ -1,6 +1,6 @@
 # Code Quality Reviewer Prompt Template
 
-Use this template when the magic-orchestrator agent dispatches a code quality
+Use this template when the mahou-orchestrator agent dispatches a code quality
 reviewer subagent. **Only dispatch after spec compliance review passes.**
 
 **Purpose:** Verify the implementation is well-built -- clean, tested, and
@@ -19,7 +19,7 @@ Task tool (general):
 
     DESCRIPTION: [one-line task summary, from the implementer's report]
     REQUIREMENTS: [full task text from the plan, or "Task N from
-      ./.magic-pi/plans/<uuid>.md" if the reviewer needs to look
+      ./.mahou/plans/<uuid>.md" if the reviewer needs to look
       up context -- but prefer pasting the task text]
     BASE_SHA: [commit SHA before this task]
     HEAD_SHA: [commit SHA after this task]
@@ -53,11 +53,30 @@ Task tool (general):
     - Are tests comprehensive for the behavior this task adds?
     - If the task specified TDD, were tests written first?
 
+    **UI Quality (only when the task touches UI code):**
+    - Does every interactive component have all 8 states:
+      default, hover, focus, active, disabled, loading, error, success?
+    - Does contrast meet WCAG AA (4.5:1 body, 3:1 large text)?
+    - Is keyboard navigation functional (tab order, focus indicators)?
+    - Are there AI-slop patterns? (side-stripe borders, gradient text,
+      glassmorphism-as-default, identical card grids, tracked uppercase
+      eyebrows)
+    - Does it follow the existing design system, or is it drift?
+      Classify: missing token / one-off implementation / conceptual
+      misalignment.
+    - Are empty/loading/error states designed, not just the happy path?
+
     **Discipline:**
     - Did the implementer only build what was requested (no scope creep)?
     - Does it follow existing patterns in the codebase?
     - Are commits well-formed (semantic, one-line messages, one logical change
       per commit)?
+
+    **Comment Quality (all tasks):**
+    - Flag AI-tell comments: TODO without context, comments that restate the
+      code ("// increment counter"), obvious comments
+    - Comments should explain WHY, not WHAT
+    - No commented-out code blocks
 
     ## Report Format
 

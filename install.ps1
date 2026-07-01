@@ -1,14 +1,14 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Install magic-pi-opencode commands into opencode's global config.
+    Install mahou commands into opencode's global config.
 .DESCRIPTION
     Copies command files to ~/.config/opencode/command/ and reference files to
-    ~/.config/opencode/magic-pi/references/. Replaces {{MAGIC_PI_HOME}} in
+    ~/.config/opencode/mahou/references/. Replaces {{MAHOU_HOME}} in
     command files with the resolved absolute path (forward slashes for @-include
     compatibility).
 .PARAMETER Uninstall
-    Remove magic-pi-opencode commands and references.
+    Remove mahou commands and references.
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -Uninstall
@@ -21,34 +21,26 @@ $ErrorActionPreference = "Stop"
 
 $ConfigDir = Join-Path $env:USERPROFILE ".config\opencode"
 $CommandDir = Join-Path $ConfigDir "command"
-$MagicPiDir = Join-Path $ConfigDir "magic-pi"
-$RefsDir = Join-Path $MagicPiDir "references"
+$MahouDir = Join-Path $ConfigDir "mahou"
+$RefsDir = Join-Path $MahouDir "references"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SourceCommands = Join-Path $ScriptDir "commands"
 $SourceRefs = Join-Path $ScriptDir "references"
 
-$CommandFiles = @(
-    "magic.md",
-    "magic-ask.md",
-    "magic-debug.md",
-    "magic-review.md",
-    "magic-brainstorm.md",
-    "magic-orchestrator.md"
-)
+# Discover all mahou command files dynamically so new commands don't need installer updates
+$CommandFiles = Get-ChildItem -Path $SourceCommands -Filter "mahou*.md" | Select-Object -ExpandProperty Name
 
-# Magic-Pi home path with forward slashes for @-include compatibility
-$MagicPiHome = ($MagicPiDir -replace '\\', '/')
+# Mahou home path with forward slashes for @-include compatibility
+$MahouHome = ($MahouDir -replace '\\', '/')
 
 if ($Uninstall) {
-    Write-Host "Uninstalling magic-pi-opencode..." -ForegroundColor Yellow
+    Write-Host "Uninstalling mahou..." -ForegroundColor Yellow
 
-    foreach ($f in $CommandFiles) {
-        $target = Join-Path $CommandDir $f
-        if (Test-Path $target) {
-            Remove-Item $target -Force
-            Write-Host "  Removed command: $f"
-        }
+    $installedCommands = Get-ChildItem -Path $CommandDir -Filter "mahou*.md" -ErrorAction SilentlyContinue
+    foreach ($cmd in $installedCommands) {
+        Remove-Item $cmd.FullName -Force
+        Write-Host "  Removed command: $($cmd.Name)"
     }
 
     if (Test-Path $RefsDir) {
@@ -56,12 +48,12 @@ if ($Uninstall) {
         Write-Host "  Removed references: $RefsDir"
     }
 
-    # Remove magic-pi dir if empty
-    if (Test-Path $MagicPiDir) {
-        $remaining = Get-ChildItem $MagicPiDir -ErrorAction SilentlyContinue
+    # Remove mahou dir if empty
+    if (Test-Path $MahouDir) {
+        $remaining = Get-ChildItem $MahouDir -ErrorAction SilentlyContinue
         if (-not $remaining) {
-            Remove-Item $MagicPiDir -Force
-            Write-Host "  Removed empty: $MagicPiDir"
+            Remove-Item $MahouDir -Force
+            Write-Host "  Removed empty: $MahouDir"
         }
     }
 
@@ -71,10 +63,10 @@ if ($Uninstall) {
 
 # --- Install ---
 
-Write-Host "Installing magic-pi-opencode..." -ForegroundColor Cyan
+Write-Host "Installing mahou..." -ForegroundColor Cyan
 
 # Create directories
-foreach ($d in @($ConfigDir, $CommandDir, $MagicPiDir, $RefsDir)) {
+foreach ($d in @($ConfigDir, $CommandDir, $MahouDir, $RefsDir)) {
     if (-not (Test-Path $d)) {
         New-Item -ItemType Directory -Path $d -Force | Out-Null
     }
@@ -86,7 +78,7 @@ Copy-Item -Path (Join-Path $SourceRefs "*") -Destination $RefsDir -Recurse -Forc
 $refCount = (Get-ChildItem $RefsDir -Recurse -File).Count
 Write-Host "    $refCount reference files installed to $RefsDir"
 
-# Copy commands with {{MAGIC_PI_HOME}} replacement
+# Copy commands with {{MAHOU_HOME}} replacement
 Write-Host "  Installing commands..."
 foreach ($f in $CommandFiles) {
     $src = Join-Path $SourceCommands $f
@@ -98,7 +90,7 @@ foreach ($f in $CommandFiles) {
     }
 
     $content = Get-Content $src -Raw
-    $content = $content -replace '\{\{MAGIC_PI_HOME\}\}', $MagicPiHome
+    $content = $content -replace '\{\{MAHOU_HOME\}\}', $MahouHome
     Set-Content -Path $dst -Value $content -NoNewline
     Write-Host "    Installed: $f"
 }
