@@ -2,107 +2,86 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { Brushstroke } from "@/components/motifs/brushstroke";
-import { HankoSeal } from "@/components/motifs/hanko-seal";
-import { MagicCard } from "@/components/effects/magic-card";
 
 const principles = [
   {
     kanji: "道",
     title: "Root cause before fix",
     description:
-      "Investigate before acting. One hypothesis, one test, verify before continuing.",
-    icon: (
-      <svg viewBox="0 0 48 48" className="h-12 w-12" aria-hidden="true">
-        <circle cx="24" cy="6" r="3" fill="var(--color-accent-violet)" />
-        <path
-          d="M24 9 L24 28 M24 28 L16 40 M24 28 L32 40 M24 28 L24 42"
-          stroke="var(--color-accent-violet)"
-          strokeWidth={2.5}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
+      "Investigate before acting. One hypothesis, one test — verify before continuing. No stacked patches.",
   },
   {
-    kanji: "道",
+    kanji: "式",
     title: "Design before code",
     description:
-      "Spec and plan before implementation. Know what you're building before you build it.",
-    icon: (
-      <svg viewBox="0 0 48 48" className="h-12 w-12" aria-hidden="true">
-        <path
-          d="M10 10 L34 10 L38 14 L38 38 L10 38 Z M14 16 L32 16 M14 22 L32 22 M14 28 L26 28"
-          stroke="var(--color-accent-violet)"
-          strokeWidth={2}
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    ),
+      "Spec and plan before implementation. Know what you are building before you build it.",
   },
   {
-    kanji: "道",
+    kanji: "証",
     title: "Verify before ship",
     description:
       "Check the build against the spec. Nothing ships without passing verification.",
-    icon: (
-      <svg viewBox="0 0 48 48" className="h-12 w-12" aria-hidden="true">
-        <rect
-          x="14"
-          y="14"
-          width="20"
-          height="20"
-          fill="none"
-          stroke="var(--color-accent-violet)"
-          strokeWidth={2.5}
-          rx="2"
-        />
-        <path
-          d="M19 19 L29 19 M19 24 L29 24 M19 29 L25 29"
-          stroke="var(--color-accent-violet)"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
   },
 ];
 
 export function Philosophy() {
   const prefersReducedMotion = useReducedMotion();
+  const ease = [0.16, 1, 0.3, 1] as const;
 
   return (
-    <section data-kanji="道" className="panel-warm">
-      <ScrollReveal className="relative mx-auto max-w-[72ch] px-8 py-32">
-        <Brushstroke />
-        <HankoSeal kanji="道" renderOn={false} />
-        <h2 className="mb-8 font-serif-jp text-5xl font-bold [text-wrap:balance]">
-          Discipline is magic
-        </h2>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-8">
-          {principles.map((principle, index) => (
-            <motion.div
-              key={principle.title}
-              initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, ease: "easeOut", delay: index * 0.15 }}
-            >
-              <MagicCard className="p-8">
-                <div className="mb-4">{principle.icon}</div>
-                <h3 className="mb-2 font-serif-jp text-2xl font-medium">
-                  {principle.title}
-                </h3>
-                <p className="text-[var(--color-text-secondary)]">
-                  {principle.description}
-                </p>
-              </MagicCard>
-            </motion.div>
-          ))}
+    <section id="doctrine" data-kanji="道" className="panel-edge">
+      <ScrollReveal className="section-shell">
+        <div className="mb-16 max-w-2xl">
+          <div className="mb-5 flex items-center gap-3">
+            <span className="seal-dot" />
+            <span className="font-jp text-sm tracking-[0.2em] text-[var(--color-accent-brass)]">
+              道 · doctrine
+            </span>
+          </div>
+          <h2 className="display-title mb-5">Three iron laws</h2>
+          <p className="lead">
+            Not guidelines — the ritual that turns chaos into power you can
+            trust.
+          </p>
         </div>
+
+        <ol className="relative space-y-0">
+          <div
+            className="absolute bottom-8 left-6 top-8 w-px bg-gradient-to-b from-[var(--color-accent-seal)] via-[var(--color-accent-brass)] to-transparent max-md:left-5"
+            aria-hidden="true"
+          />
+
+          {principles.map((principle, index) => (
+            <motion.li
+              key={principle.title}
+              className="relative grid gap-5 border-b border-[var(--color-line)] py-10 pl-14 last:border-b-0 md:grid-cols-[auto_minmax(0,1fr)_minmax(0,1.5fr)] md:items-center md:gap-10 md:pl-16"
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -16 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.55, ease, delay: index * 0.07 }}
+            >
+              <span
+                className="absolute left-3 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-[var(--color-accent-seal)] shadow-[0_0_16px_rgba(212,59,42,0.5)] md:left-4"
+                aria-hidden="true"
+              />
+
+              <span
+                className="font-serif-jp text-5xl leading-none text-[var(--color-accent-seal)] md:text-6xl"
+                aria-hidden="true"
+              >
+                {principle.kanji}
+              </span>
+
+              <h3 className="text-2xl font-semibold tracking-tight md:text-[1.65rem]">
+                {principle.title}
+              </h3>
+
+              <p className="text-[var(--color-text-secondary)] [text-wrap:pretty]">
+                {principle.description}
+              </p>
+            </motion.li>
+          ))}
+        </ol>
       </ScrollReveal>
     </section>
   );

@@ -1,6 +1,12 @@
 "use client";
 
-import { motion, useScroll, useVelocity, useTransform, useReducedMotion } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useVelocity,
+  useTransform,
+  useReducedMotion,
+} from "motion/react";
 import { useEffect, useState } from "react";
 
 interface ActiveSection {
@@ -14,12 +20,14 @@ export function InkThread() {
   const scrollVelocity = useVelocity(scrollY);
 
   const absVelocity = useTransform(scrollVelocity, (v) => Math.abs(v));
-  const strokeWidth = useTransform(absVelocity, [0, 800, 2000], [4, 2, 1]);
+  const strokeWidth = useTransform(absVelocity, [0, 800, 2000], [3, 1.5, 1]);
   const blurFilter = useTransform(absVelocity, [0, 800, 2000], [0, 1, 2]);
   const kanjiOpacity = useTransform(absVelocity, [0, 300], [1, 0]);
   const blurPx = useTransform(blurFilter, (v) => `blur(${v}px)`);
 
-  const [activeSection, setActiveSection] = useState<ActiveSection | null>(null);
+  const [activeSection, setActiveSection] = useState<ActiveSection | null>(
+    null
+  );
 
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -47,14 +55,19 @@ export function InkThread() {
           if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
             best = {
               kanji: entry.target.getAttribute("data-kanji") || "",
-              y: entry.boundingClientRect.top + entry.boundingClientRect.height / 2,
+              y:
+                entry.boundingClientRect.top +
+                entry.boundingClientRect.height / 2,
             };
             bestRatio = entry.intersectionRatio;
           }
         }
         if (best) setActiveSection(best);
       },
-      { threshold: [0, 0.1, 0.25, 0.5, 0.75, 1], rootMargin: "-20% 0px -20% 0px" }
+      {
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+        rootMargin: "-20% 0px -20% 0px",
+      }
     );
 
     sections.forEach((s) => observer.observe(s));
@@ -70,9 +83,9 @@ export function InkThread() {
         <span
           className="font-jp text-2xl"
           style={{
-            color: "var(--color-accent-warm)",
-            opacity: activeSection ? 0.5 : 0,
-            textShadow: "0 0 8px rgba(255, 184, 108, 0.2)",
+            color: "var(--color-accent-seal)",
+            opacity: activeSection ? 0.55 : 0,
+            textShadow: "0 0 10px rgba(212, 59, 42, 0.25)",
             transition: "opacity 0.3s ease",
           }}
         >
@@ -94,7 +107,7 @@ export function InkThread() {
             y1="0"
             x2="24"
             y2="100%"
-            stroke="rgba(109,74,255,0.08)"
+            stroke="rgba(212,59,42,0.1)"
             strokeWidth={2}
           />
         </svg>
@@ -113,7 +126,7 @@ export function InkThread() {
           y1="0"
           x2="24"
           y2="100%"
-          stroke="rgba(109,74,255,0.12)"
+          stroke="rgba(212,59,42,0.14)"
           style={{ strokeWidth, filter: blurPx }}
         />
         {activeSection && (
@@ -122,11 +135,10 @@ export function InkThread() {
             y={activeSection.y}
             textAnchor="middle"
             fontFamily="var(--font-jp), sans-serif"
-            fontSize="24"
-            fill="var(--color-accent-warm)"
+            fontSize="22"
+            fill="var(--color-accent-seal)"
             style={{
               opacity: kanjiOpacity,
-              textShadow: "0 0 4px rgba(255, 184, 108, 0.3), 0 0 8px rgba(255, 184, 108, 0.15)"
             }}
           >
             {activeSection.kanji}

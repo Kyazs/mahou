@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 import { ScrollReveal } from "@/components/effects/scroll-reveal";
-import { Brushstroke } from "@/components/motifs/brushstroke";
-import { HankoSeal } from "@/components/motifs/hanko-seal";
 import { CopyButton } from "@/components/effects/copy-button";
 
 interface TerminalLine {
@@ -17,17 +15,54 @@ interface TerminalLine {
 
 const LINES: TerminalLine[] = [
   { type: "comment", text: "# Install", copyText: "# Install" },
+  {
+    type: "command",
+    prompt: "$",
+    text: "git clone https://github.com/Kyazs/mahou.git",
+    copyText: "git clone https://github.com/Kyazs/mahou.git",
+  },
   { type: "command", prompt: "$", text: "cd mahou", copyText: "cd mahou" },
-  { type: "command", prompt: "$", text: ".\\install.ps1", comment: "# Windows", copyText: ".\\install.ps1" },
-  { type: "command", prompt: "$", text: "./install.sh", comment: "# macOS / Linux", copyText: "./install.sh" },
-  { type: "comment", text: "# Typical workflow", copyText: "# Typical workflow" },
-  { type: "command", prompt: ">", text: "/mahou-brainstorm add real-time notifications", copyText: "/mahou-brainstorm add real-time notifications" },
-  { type: "command", prompt: ">", text: "/mahou-orchestrator ./.mahou/plans/<uuid>.md", copyText: "/mahou-orchestrator ./.mahou/plans/<uuid>.md" },
-  { type: "command", prompt: ">", text: "/mahou-verify", copyText: "/mahou-verify" },
+  {
+    type: "command",
+    prompt: "$",
+    text: ".\\install.ps1",
+    comment: "# Windows",
+    copyText: ".\\install.ps1",
+  },
+  {
+    type: "command",
+    prompt: "$",
+    text: "./install.sh",
+    comment: "# macOS / Linux",
+    copyText: "./install.sh",
+  },
+  {
+    type: "comment",
+    text: "# Typical workflow",
+    copyText: "# Typical workflow",
+  },
+  {
+    type: "command",
+    prompt: ">",
+    text: "/mahou-brainstorm add real-time notifications",
+    copyText: "/mahou-brainstorm add real-time notifications",
+  },
+  {
+    type: "command",
+    prompt: ">",
+    text: "/mahou-orchestrator ./.mahou/plans/<uuid>.md",
+    copyText: "/mahou-orchestrator ./.mahou/plans/<uuid>.md",
+  },
+  {
+    type: "command",
+    prompt: ">",
+    text: "/mahou-verify",
+    copyText: "/mahou-verify",
+  },
   { type: "command", prompt: ">", text: "/mahou-ship", copyText: "/mahou-ship" },
 ];
 
-const TYPE_SPEED_MS = 30;
+const TYPE_SPEED_MS = 26;
 
 export function QuickStart() {
   const prefersReducedMotion = useReducedMotion();
@@ -71,7 +106,7 @@ export function QuickStart() {
           startTyping();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.25 }
     );
 
     if (containerRef.current) observer.observe(containerRef.current);
@@ -84,23 +119,58 @@ export function QuickStart() {
   const allDone = Boolean(prefersReducedMotion) || visibleLines >= LINES.length;
 
   return (
-    <section data-kanji="始" className="panel-cold">
-      <ScrollReveal className="relative mx-auto max-w-[72ch] px-8 py-32">
-        <Brushstroke />
-        <HankoSeal kanji="始" renderOn={false} />
-        <h2 className="mb-8 font-serif-jp text-5xl font-bold [text-wrap:balance]">
-          Quick start
-        </h2>
+    <section id="install" data-kanji="始" className="panel-edge">
+      <ScrollReveal className="section-shell">
+        <div className="mb-12 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-end">
+          <div>
+            <div className="mb-5 flex items-center gap-3">
+              <span className="seal-dot" />
+              <span className="font-jp text-sm tracking-[0.2em] text-[var(--color-accent-brass)]">
+                始 · begin
+              </span>
+            </div>
+            <h2 className="display-title mb-5">Install in one breath</h2>
+            <p className="lead">
+              Clone, run the installer, restart opencode. No plugins. No MCP. No
+              npm. Just slash commands that enforce the craft.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 lg:justify-end">
+            <a
+              href="https://github.com/Kyazs/mahou"
+              className="btn-primary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Clone on GitHub
+            </a>
+            <a
+              href="https://github.com/Kyazs/mahou/blob/main/README.md"
+              className="btn-secondary"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Full docs
+            </a>
+          </div>
+        </div>
+
         <div
           ref={containerRef}
-          className="overflow-hidden rounded-xl border border-[rgba(109,74,255,0.18)] bg-[#0e0e14]"
+          className="overflow-hidden border border-[color-mix(in_oklab,var(--color-accent-seal)_30%,transparent)] bg-[#0c0a09] shadow-[0_0_90px_rgba(212,59,42,0.08)]"
         >
-          <div className="flex gap-2 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] px-4 py-3">
-            <span className="h-3 w-3 rounded-full bg-[rgba(197,69,69,0.5)]" />
-            <span className="h-3 w-3 rounded-full bg-[rgba(255,184,108,0.5)]" />
-            <span className="h-3 w-3 rounded-full bg-[rgba(109,74,255,0.5)]" />
+          <div className="flex items-center justify-between gap-4 border-b border-[var(--color-line)] bg-[rgba(255,255,255,0.02)] px-4 py-3">
+            <div className="flex gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(212,59,42,0.7)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(201,160,106,0.65)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[rgba(138,131,120,0.55)]" />
+            </div>
+            <span className="font-mono text-[0.65rem] tracking-[0.16em] text-[var(--color-text-faint)]">
+              terminal · mahou
+            </span>
           </div>
-          <div className="overflow-x-auto p-8 font-mono text-[0.9rem] leading-7 max-md:text-[0.8rem]">
+          <div className="overflow-x-auto p-6 font-mono text-[0.875rem] leading-7 sm:p-8 sm:text-[0.9rem]">
             {LINES.map((line, index) => {
               if (!prefersReducedMotion && index > visibleLines) return null;
               const isCurrentLine = index === visibleLines && !allDone;
@@ -111,22 +181,22 @@ export function QuickStart() {
 
               return (
                 <div key={index} className="group flex items-center gap-2">
-                  <div className="flex-1 whitespace-nowrap max-md:whitespace-pre-wrap max-md:break-all">
+                  <div className="min-w-0 flex-1 whitespace-nowrap max-md:whitespace-pre-wrap max-md:break-all">
                     {line.type === "comment" && (
-                      <span className="text-[var(--color-text-secondary)]">
+                      <span className="text-[var(--color-text-faint)]">
                         {displayedText}
                       </span>
                     )}
                     {line.type === "command" && (
                       <>
-                        <span className="font-semibold text-[var(--color-accent-violet)]">
+                        <span className="font-semibold text-[var(--color-accent-seal)]">
                           {line.prompt}
                         </span>{" "}
-                        <span className="text-[var(--color-accent-warm)]">
+                        <span className="text-[var(--color-accent-brass)]">
                           {displayedText}
                         </span>
                         {line.comment && isFullyTyped && (
-                          <span className="text-[var(--color-text-secondary)]">
+                          <span className="text-[var(--color-text-faint)]">
                             {"  "}
                             {line.comment}
                           </span>
@@ -137,7 +207,7 @@ export function QuickStart() {
                       <span
                         className="ml-0.5 inline-block h-[14px] w-[7px] align-[-2px]"
                         style={{
-                          backgroundColor: "var(--color-accent-warm)",
+                          backgroundColor: "var(--color-accent-brass)",
                           animation: "cursor-blink 1s step-end infinite",
                         }}
                       />

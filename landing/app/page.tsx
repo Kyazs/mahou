@@ -1,3 +1,4 @@
+import { SiteNav } from "@/components/sections/site-nav";
 import { Hero } from "@/components/sections/hero";
 import { Name } from "@/components/sections/name";
 import { Philosophy } from "@/components/sections/philosophy";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <>
       <InkThread />
+      <SiteNav />
       <main className="relative z-10">
         <Hero />
         <Name />

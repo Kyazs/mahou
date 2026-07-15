@@ -17,13 +17,20 @@ export function StampOverlay({ kanji, visible }: StampOverlayProps) {
         aria-hidden="true"
       >
         <div style={{ opacity: 0.15 }}>
-            <svg viewBox="0 0 100 100" className="h-[min(60vh,60vw)] w-[min(60vh,60vw)]" aria-hidden="true">
+          <svg
+            viewBox="0 0 100 100"
+            className="h-[min(60vh,60vw)] w-[min(60vh,60vw)]"
+            aria-hidden="true"
+          >
             <g>
               <rect
-                x="14" y="14" width="72" height="72" rx="6"
-                fill="var(--color-accent-crimson)"
-                fillOpacity={0.85}
-                style={{ filter: "blur(1px)", boxShadow: "0 0 12px rgba(197, 69, 69, 0.5)" }}
+                x="14"
+                y="14"
+                width="72"
+                height="72"
+                rx="4"
+                fill="var(--color-accent-seal)"
+                fillOpacity={0.9}
               />
               <text
                 x="50%"
@@ -31,7 +38,7 @@ export function StampOverlay({ kanji, visible }: StampOverlayProps) {
                 textAnchor="middle"
                 fontFamily="var(--font-jp), sans-serif"
                 fontSize="46"
-                fill="#fff8f0"
+                fill="#fff6ee"
               >
                 {kanji}
               </text>
@@ -47,11 +54,7 @@ export function StampOverlay({ kanji, visible }: StampOverlayProps) {
       className="pointer-events-none absolute inset-0 z-40 flex items-center justify-center"
       aria-hidden="true"
       initial={{ opacity: 0 }}
-      animate={
-        visible
-          ? { opacity: [0, 1, 1, 0.15] }
-          : { opacity: 0 }
-      }
+      animate={visible ? { opacity: [0, 1, 1, 0.15] } : { opacity: 0 }}
       transition={{
         duration: visible ? 1.1 : 0.3,
         times: visible ? [0, 0.55, 0.75, 1] : undefined,
@@ -70,13 +73,20 @@ export function StampOverlay({ kanji, visible }: StampOverlayProps) {
           ease: [0.16, 1, 0.3, 1],
         }}
       >
-        <svg viewBox="0 0 100 100" className="h-[60vh] w-[60vh]" aria-hidden="true">
+        <svg
+          viewBox="0 0 100 100"
+          className="h-[60vh] w-[60vh]"
+          aria-hidden="true"
+        >
           <g>
             <rect
-              x="14" y="14" width="72" height="72" rx="6"
-              fill="var(--color-accent-crimson)"
-              fillOpacity={0.85}
-              style={{ filter: "blur(1px)", boxShadow: "0 0 12px rgba(197, 69, 69, 0.5)" }}
+              x="14"
+              y="14"
+              width="72"
+              height="72"
+              rx="4"
+              fill="var(--color-accent-seal)"
+              fillOpacity={0.9}
             />
             <text
               x="50%"
@@ -84,7 +94,7 @@ export function StampOverlay({ kanji, visible }: StampOverlayProps) {
               textAnchor="middle"
               fontFamily="var(--font-jp), sans-serif"
               fontSize="46"
-              fill="#fff8f0"
+              fill="#fff6ee"
             >
               {kanji}
             </text>

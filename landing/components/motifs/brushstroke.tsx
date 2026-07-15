@@ -13,7 +13,7 @@ export function Brushstroke() {
     >
       <motion.path
         d="M4 6 C20 1, 40 11, 60 6 S100 1, 116 6"
-        stroke="var(--color-accent-warm)"
+        stroke="var(--color-accent-brass)"
         strokeWidth={4}
         fill="none"
         strokeLinecap="round"

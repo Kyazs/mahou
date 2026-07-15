@@ -36,12 +36,12 @@ export function CopyButton({ text, className = "" }: CopyButtonProps) {
     <button
       onClick={handleCopy}
       aria-label="Copy command"
-      className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent-warm)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent-warm)] focus-visible:outline-offset-2 ${className}`}
+      className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-xs text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent-brass)] focus-visible:outline-2 focus-visible:outline-[var(--color-accent-brass)] focus-visible:outline-offset-2 ${className}`}
     >
       {copied ? (
         <>
-          <Check className="h-3.5 w-3.5 text-[var(--color-accent-warm)]" />
-          <span className="text-[var(--color-accent-warm)]">Copied!</span>
+          <Check className="h-3.5 w-3.5 text-[var(--color-accent-brass)]" />
+          <span className="text-[var(--color-accent-brass)]">Copied!</span>
         </>
       ) : (
         <Copy className="h-3.5 w-3.5" />

@@ -31,7 +31,7 @@ export function SeigaihaWaves({
   }, []);
 
   const wavePath =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23ffb86c' stroke-width='1.5'%3E%3Cpath d='M0 30 A15 15 0 0 1 30 30 A15 15 0 0 1 60 30'/%3E%3Cpath d='M0 30 A10 10 0 0 1 20 30 A10 10 0 0 1 40 30 A10 10 0 0 1 60 30'/%3E%3Cpath d='M0 30 A5 5 0 0 1 10 30 A5 5 0 0 1 20 30 A5 5 0 0 1 30 30 A5 5 0 0 1 40 30 A5 5 0 0 1 50 30 A5 5 0 0 1 60 30'/%3E%3C/g%3E%3C/svg%3E";
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='30' viewBox='0 0 60 30'%3E%3Cg fill='none' stroke='%23c9a06a' stroke-width='1.5'%3E%3Cpath d='M0 30 A15 15 0 0 1 30 30 A15 15 0 0 1 60 30'/%3E%3Cpath d='M0 30 A10 10 0 0 1 20 30 A10 10 0 0 1 40 30 A10 10 0 0 1 60 30'/%3E%3Cpath d='M0 30 A5 5 0 0 1 10 30 A5 5 0 0 1 20 30 A5 5 0 0 1 30 30 A5 5 0 0 1 40 30 A5 5 0 0 1 50 30 A5 5 0 0 1 60 30'/%3E%3C/g%3E%3C/svg%3E";
 
   return (
     <div
@@ -47,7 +47,7 @@ export function SeigaihaWaves({
         backgroundImage: visible ? `url("${wavePath}")` : "none",
         backgroundSize: "60px 30px",
         backgroundRepeat: "repeat-x",
-        opacity: 0.12,
+        opacity: 0.14,
       }}
       aria-hidden="true"
     />

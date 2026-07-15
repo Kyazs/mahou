@@ -7,7 +7,10 @@ interface ParticleFieldProps {
   scopeToSection?: boolean;
 }
 
-export function ParticleField({ variant = "default", scopeToSection = false }: ParticleFieldProps) {
+export function ParticleField({
+  variant = "default",
+  scopeToSection = false,
+}: ParticleFieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -33,8 +36,8 @@ export function ParticleField({ variant = "default", scopeToSection = false }: P
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
-    const COLOR_WARM = "#ffb86c";
-    const COLOR_GLOW = "#8b5cf6";
+    const COLOR_BRASS = "#c9a06a";
+    const COLOR_SEAL = "#d43b2a";
 
     function resize() {
       if (!canvas || !ctx) return;
@@ -54,15 +57,22 @@ export function ParticleField({ variant = "default", scopeToSection = false }: P
       const area = width * height;
       const count = Math.min(Math.floor(area / 18000), 20);
       for (let i = 0; i < count; i++) {
-        const isWarm = variant === "embers" ? Math.random() < 0.5 : Math.random() < 0.2;
+        const isSeal =
+          variant === "embers" ? Math.random() < 0.55 : Math.random() < 0.25;
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: variant === "embers" ? (Math.random() - 0.5) * 0.15 : (Math.random() - 0.5) * 0.2,
-          vy: variant === "embers" ? -(0.15 + Math.random() * 0.35) : (Math.random() - 0.5) * 0.2,
+          vx:
+            variant === "embers"
+              ? (Math.random() - 0.5) * 0.15
+              : (Math.random() - 0.5) * 0.2,
+          vy:
+            variant === "embers"
+              ? -(0.15 + Math.random() * 0.35)
+              : (Math.random() - 0.5) * 0.2,
           radius: Math.random() * 1.2 + 0.4,
           alpha: Math.random() * 0.4 + 0.2,
-          color: isWarm ? COLOR_WARM : COLOR_GLOW,
+          color: isSeal ? COLOR_SEAL : COLOR_BRASS,
         });
       }
       draw();
@@ -98,7 +108,10 @@ export function ParticleField({ variant = "default", scopeToSection = false }: P
         p.x += p.vx;
         p.y += p.vy;
         if (variant === "embers") {
-          if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+          if (p.y < -10) {
+            p.y = height + 10;
+            p.x = Math.random() * width;
+          }
           if (p.x < 0) p.x = width;
           if (p.x > width) p.x = 0;
         } else {

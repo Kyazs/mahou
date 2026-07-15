@@ -27,7 +27,7 @@ export function MagicCard({ children, className = "" }: MagicCardProps) {
       onMouseLeave={() => setIsHovering(false)}
       style={{
         boxShadow: isHovering
-          ? `0 8px 24px rgba(255, 184, 108, 0.12)`
+          ? `0 8px 24px rgba(201, 160, 106, 0.12)`
           : "none",
       }}
     >
@@ -35,7 +35,7 @@ export function MagicCard({ children, className = "" }: MagicCardProps) {
         className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300"
         style={{
           opacity: isHovering ? 1 : 0,
-          background: `radial-gradient(200px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 184, 108, 0.08), transparent 70%)`,
+          background: `radial-gradient(200px circle at ${mousePos.x}px ${mousePos.y}px, rgba(201, 160, 106, 0.08), transparent 70%)`,
         }}
       />
       {children}
