@@ -1,3 +1,8 @@
+---
+name: mahou-git-workflow
+description: Branch strategy, commit conventions, merge strategy, conflict resolution — use for any git operation
+---
+
 # Git Workflow Reference
 
 Loaded by all mahou commands that touch git, via @-include. This is the

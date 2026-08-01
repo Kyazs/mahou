@@ -1,3 +1,8 @@
+---
+name: mahou-root-cause-tracing
+description: Trace bugs backward through the call stack to the original trigger — use during mahou-debug Phase 1 investigation
+---
+
 # Root Cause Tracing
 
 ## Overview

@@ -1,14 +1,7 @@
 ---
 description: "Systematic root-cause debugging — root cause before fix, evidence over guessing"
 argument-hint: "[bug description or error message]"
-tools:
-  read: true
-  write: true
-  edit: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
+model: opencode-go/grok-4.5
 ---
 
 <objective>
@@ -54,6 +47,17 @@ discipline below governs WHEN you may use each:
 
 You MAY write throwaway diagnostic scripts during investigation. Mark them
 clearly and remove them when done.
+
+**Evidence discipline (large files/logs):** never paste a 700KB log or a
+whole module into your context. Derive the answer in code instead:
+- Log/test-output/build-output analysis → `grep -n <pattern> <file>`, `wc -l`,
+  `head`/`tail`, or a one-line `python`/`node` command that prints only the
+  derived answer (error count, first failure, matching lines).
+- Multi-command evidence gathering → batch the commands and print only the
+  relevant sections.
+- If a tool or doc is needed repeatedly during the session, index once and
+  search the extracted facts rather than re-reading.
+This keeps your context free for root-cause reasoning.
 </tools_guidance>
 
 <subagents>
@@ -111,7 +115,10 @@ You MUST complete each phase before proceeding to the next.
 
 1. **Create a failing test case.** Simplest possible reproduction.
 2. **Implement a single fix.** Address the root cause. ONE change at a time.
-3. **Verify the fix.** Test passes? No other tests broken?
+3. **Verify the fix.** Test passes? No other tests broken? Follow the
+   verification-before-completion discipline (reference below): run the
+   failing repro AND the full relevant suite, and report the evidence — never
+   declare the bug fixed from inspection alone.
 4. **If the fix doesn't work.** Count how many fixes you've tried:
    - If < 3: return to Phase 1, re-analyze.
    - If >= 3: STOP and question the architecture. Discuss with your human
@@ -122,6 +129,20 @@ You MUST complete each phase before proceeding to the next.
    condition-based waiting. See the condition-based-waiting reference below.
 </phases>
 
+<no_root_cause>
+If systematic investigation reveals the issue is truly environmental,
+timing-dependent, or external:
+
+1. You've completed the process.
+2. Document what you investigated and what was ruled out.
+3. Implement appropriate handling (retry, timeout, error message) if the
+   system can degrade gracefully.
+4. Add monitoring/logging for future investigation.
+
+But: 95% of "no root cause" cases are incomplete investigation. Only reach
+this section after genuinely exhausting the trace.
+</no_root_cause>
+
 <red_flags>
 If you catch yourself thinking:
 - "Quick fix for now, investigate later"
@@ -129,6 +150,10 @@ If you catch yourself thinking:
 - "Add multiple changes, run tests"
 - "Skip the test, I'll manually verify"
 - "It's probably X, let me fix that"
+- "I don't fully understand but this might work"
+- "Pattern says X but I'll adapt it differently"
+- "Here are the main problems: [lists fixes without investigation]"
+- Proposing solutions before tracing data flow
 - "One more fix attempt" (when already tried 2+)
 - Each fix reveals a new problem in a different place
 
@@ -136,6 +161,29 @@ If you catch yourself thinking:
 
 **If 3+ fixes failed:** question the architecture (Phase 4, step 5).
 </red_flags>
+
+<human_signals>
+Watch for these redirections from your human partner:
+- "Is that not happening?" — you assumed without verifying.
+- "Will it show us...?" — you should have added evidence gathering.
+- "Stop guessing" — you're proposing fixes without understanding.
+- "We're stuck?" (frustrated) — your approach isn't working.
+
+When you see these: STOP. Return to Phase 1.
+</human_signals>
+
+<rationalizations>
+| Excuse | Reality |
+|--------|---------|
+| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
+| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
+| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
+| "I'll write the test after confirming the fix works" | Untested fixes don't stick. Test first proves it. |
+| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
+| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
+| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
+| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+</rationalizations>
 
 <integration>
 - If the fix is small and surgical -> finish it here.
@@ -148,13 +196,15 @@ If you catch yourself thinking:
 </integration>
 
 <references>
-@{{MAHOU_HOME}}/references/root-cause-tracing.md
+@{{MAHOU_HOME}}/skills/mahou-root-cause-tracing/SKILL.md
 
-@{{MAHOU_HOME}}/references/defense-in-depth.md
+@{{MAHOU_HOME}}/skills/mahou-defense-in-depth/SKILL.md
 
-@{{MAHOU_HOME}}/references/condition-based-waiting.md
+@{{MAHOU_HOME}}/skills/mahou-condition-waiting/SKILL.md
 
-@{{MAHOU_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/skills/mahou-verification-completion/SKILL.md
+
+@{{MAHOU_HOME}}/skills/mahou-git-workflow/SKILL.md
 
 The bisection script for test polluters is at
 `{{MAHOU_HOME}}/references/find-polluter.sh`.

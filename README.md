@@ -38,21 +38,34 @@ The framework operates across three layers:
 ### How it works
 
 Each command is a markdown file with YAML frontmatter. opencode reads the
-frontmatter to register the slash command and enforce tool access. The body
-becomes the command's prompt.
+frontmatter to register the slash command, route it to an agent, and assign a
+model. The body becomes the command's prompt.
 
-- **Tool access is enforced, not requested.** The `tools:` frontmatter lists
-  which tools a command may use. Read-only commands omit `write`/`edit` —
-  opencode blocks mutations at the tool level, not just by prompt instruction.
+- **Tool access is enforced at the agent level, not requested.** The
+  `agent:` frontmatter routes read-only commands (`ask`, `review`, `verify`,
+  `secure`, `resume`, `ship`, `orchestrator`) to the `mahou-readonly` agent,
+  which denies `edit`/`write` and destructive bash at the tool level.
+  Design/project commands (`brainstorm`, `new-project`, `init`,
+  `postmortem`) run under `mahou-planner`, which denies every file write
+  outside `./.mahou/**`. opencode's command frontmatter does not support a
+  `tools:` field — enforcement comes from these agents.
+- **Role subagents carry their own enforcement.** The orchestrator dispatches
+  `implementer`, `spec-reviewer`, `code-quality-reviewer`, and
+  `integration-reviewer` subagents; review dispatches `issue-verifier`. Each
+  is a real opencode agent with tool-level permission config (reviewers deny
+  `edit`/`write`), not just a prompt template. The orchestrator's own agent
+  restricts the Task tool to exactly these subagents via `permission.task`.
 - **Reference docs load via `@`-includes.** Command bodies use
-  `@{{MAHOU_HOME}}/references/<file>.md` to pull in technique guides and
-  subagent prompt templates. The token is resolved to an absolute path at
-  install time.
+  `@{{MAHOU_HOME}}/skills/<name>/SKILL.md` to pull in technique guides. The
+  same skills are also installed to `~/.config/opencode/skills/` for the
+  native skill tool (on-demand, permission-gated per agent).
 - **Zero structural token cost.** Nothing auto-injects on every prompt. All
   context loads only when a command is invoked. Heavy data (web pages, large
   file reads) stays inside subagent disposable context.
-- **No runtime dependencies.** Everything is static markdown. Nothing is
-  downloaded from the internet. No MCP servers, no hooks, no telemetry.
+- **No runtime dependencies.** Everything is static markdown, one TypeScript
+  plugin (compaction persistence), and one TypeScript tool (vision
+  fallback). Nothing is downloaded from the internet. No MCP servers, no
+  telemetry.
 
 ## Install
 
@@ -102,11 +115,18 @@ mv ./.magic-pi ./.mahou
 
 ### What the installer does
 
-1. Copies `references/` to `~/.config/opencode/mahou/references/`.
-2. Copies `commands/*.md` to `~/.config/opencode/command/`, replacing
+1. Copies `commands/*.md` to `~/.config/opencode/commands/`, replacing
    `{{MAHOU_HOME}}` with the resolved absolute path (for `@`-include
    compatibility).
-3. Nothing is downloaded from the internet. No dependencies required.
+2. Copies `agents/` to `~/.config/opencode/agents/` (permission-enforced
+   agents), `skills/` to `~/.config/opencode/skills/` **and**
+   `~/.config/opencode/mahou/skills/` (skill-tool discovery + `@`-include),
+   `plugins/` to `~/.config/opencode/plugins/`, and `tools/` to
+   `~/.config/opencode/tools/`.
+3. Copies `references/` to `~/.config/opencode/mahou/references/` (subagent
+   prompt templates + scripts).
+4. Cleans up legacy singular-dir installs (`~/.config/opencode/command/`).
+5. Nothing is downloaded from the internet. No dependencies required.
 
 ### Uninstall
 
@@ -163,10 +183,14 @@ If you already have a project and just want to build one feature:
 | `/mahou-debug` | Systematic root-cause debugging (4 phases) | full |
 | `/mahou-review` | Code review of existing scope (discover, triage, verify, report) | read-only |
 | `/mahou-brainstorm` | Design to spec to implementation plan | spec/plan writable |
+| `/mahou-designer` | Design and ship production-grade frontend interfaces | full |
 | `/mahou-orchestrator` | Execute a plan task-by-task via subagents with two-stage review | read-only (delegates) |
+| `/mahou-ultracode` | Max-effort execution via large-scale parallel subagent waves | full |
 | `/mahou-verify` | Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN | read-only |
+| `/mahou-secure` | Security verification of a change — PASS, FIX, or ESCALATE | read-only |
 | `/mahou-resume` | Resume work from previous session with reconciliation | read-only |
 | `/mahou-ship` | Push branch, create PR, filter .mahou/ artifacts | read-only + bash |
+| `/mahou-postmortem` | Write a post-mortem for a resolved incident | .mahou/ only |
 
 ## Commands
 
@@ -213,8 +237,14 @@ behavior, performance problems, build failures, integration issues.
    possible change, verify before continuing. If it doesn't work, form a new
    hypothesis — don't stack fixes.
 4. **Implementation** — create a failing test case, implement a single fix at
-   the root cause, verify, then harden with defense-in-depth and a regression
-   test.
+   the root cause, verify with the verification-before-completion discipline
+   (run the failing repro AND the relevant suite, report the evidence), then
+   harden with defense-in-depth and a regression test.
+
+If systematic investigation reveals a genuinely environmental/timing/external
+issue, document what was investigated, add graceful handling (retry, timeout,
+error message) and monitoring — but 95% of "no root cause" cases are
+incomplete investigation.
 
 **Iron law:** No fixes without root cause investigation first. If you haven't
 completed Phase 1, you cannot propose fixes.
@@ -332,6 +362,10 @@ agent instead.
 
 **Process:** Per-task cycle:
 
+0. **Baseline verification gate** — before any task, run the test suite and
+   build once and record the result in state.json. A red baseline stops the
+   orchestration (routes to `/mahou-debug`); implementing on a red baseline
+   makes every later failure uninterpretable.
 1. Capture the BASE_SHA (`git rev-parse HEAD`).
 2. Dispatch an implementer subagent with the full task text pasted into the
    prompt (the subagent never reads the plan file).
@@ -345,6 +379,11 @@ agent instead.
 6. Mark the task complete, update state.json and ROADMAP.md.
 7. Every N tasks (default 3): dispatch an integration reviewer to check seam
    bugs between tasks.
+
+Review loops re-dispatch the same implementer with the receiving-code-review
+discipline (fix, don't argue; push back only with code evidence; re-verify;
+report deltas). Implementers must verify before reporting DONE — the
+verification-before-completion discipline.
 
 After all tasks: a final code review for the entire implementation, then
 branch finish guidance.
@@ -461,7 +500,95 @@ planning artifacts from the PR diff.
 
 **When to use:** After `/mahou-verify` returns PASS.
 
+**Process:** Runs a **test gate** before pushing — the project's test suite
+must pass or the ship stops and routes to `/mahou-debug`. Never push a red
+branch.
+
 **Tools & access:** Read-only + bash — `read, bash, grep, glob`.
+
+### /mahou-designer
+
+**What it does:** Designs AND ships production-grade frontend interfaces to a
+studio bar — not prototypes. Runs the impeccable design discipline: read the
+room, shape before build, build to the bar, inspect and iterate, with the
+two-altitude AI slop test, absolute bans (side-stripe borders, gradient text,
+glassmorphism-as-default, hero-metric template, eyebrow labels), and
+brand/product registers. Critique is an intent inside the command (report-only
+unless asked to fix).
+
+**When to use:** Frontend interface work — design, redesign, polish, or
+critique of websites, landing pages, dashboards, product UI. Not for
+backend-only work.
+
+**Tools & access:** Full (designs AND builds). Model-routed to a most-capable
+model via frontmatter. Loads `mahou-design-craft` skill for the craft and
+critique framework.
+
+**Example:**
+
+```text
+/mahou-designer Redesign the settings page with a better information hierarchy
+```
+
+### /mahou-ultracode
+
+**What it does:** Max-effort execution for work too large for one context
+window: codebase-wide audits, large migrations, multi-file refactors,
+cross-checked research. Fans out subagent waves (≤16 concurrent) via the Task
+tool, runs adversarial verification passes, fix-until-green loops, and
+multi-angle planning, then returns one coordinated, verified answer.
+
+**When to use:** 50+ files, 100+ items, whole-repo sweeps. For vague or
+green-field projects it defers to `/mahou-brainstorm` or the plan agent first,
+and confirms scope before fanning out writers.
+
+**Tools & access:** Full. Loads `mahou-ultracode-patterns` skill for the wave
+patterns and budget rules.
+
+**Example:**
+
+```text
+/mahou-ultracode Audit the entire codebase for missing auth checks and fix them
+```
+
+### /mahou-secure
+
+**What it does:** Security verification gate before shipping. Reviews the
+change's diff against 7 categories (secrets, injection, authz, data exposure,
+input validation, dependencies, crypto), verifies each triaged issue via
+independent subagents (CONFIRMED / REFUTED / UNDETERMINED), and produces a
+verdict: PASS (→ /mahou-ship), FIX (→ /mahou-debug), or ESCALATE (→
+/mahou-brainstorm). Writes a report to `./.mahou/verify/secure-<uuid>.md`.
+
+**When to use:** After `/mahou-verify` returns PASS and the change is
+security-sensitive (auth, payments, user data, secrets, network input).
+
+**Tools & access:** Read-only via the `mahou-readonly` agent.
+
+**Example:**
+
+```text
+/mahou-secure <feature name or commit range>
+```
+
+### /mahou-postmortem
+
+**What it does:** Produces a post-mortem for a resolved bug or incident —
+timeline, root cause analysis, the fix, defense-in-depth applied, and
+monitoring follow-ups — written to `./.mahou/postmortems/<uuid>.md`. The
+codebase stays untouched.
+
+**When to use:** After a bug is fixed and verified (typically after
+`/mahou-debug`), to preserve the learning.
+
+**Tools & access:** Runs under the `mahou-planner` agent — writes ONLY to
+`./.mahou/postmortems/` (tool-enforced).
+
+**Example:**
+
+```text
+/mahou-postmortem The intermittent auth test failure we just root-caused
+```
 
 ## Workflows
 
@@ -530,10 +657,13 @@ These rules must not be violated by any command or reference:
 1. **Zero structural token cost** — nothing auto-injects on every prompt;
    everything loads via `@`-include when invoked or inside subagent isolated
    context
-2. **Tool-level read-only enforcement** — read-only commands omit `edit`/`write`
-   in frontmatter
+2. **Tool-level read-only enforcement** — read-only commands route to the
+   `mahou-readonly` agent (`edit`/`write` and destructive bash denied at the
+   tool level); write access outside `./.mahou/` is denied for planning
+   commands via the `mahou-planner` agent
 3. **No MCP, no npm, no plugins, no hooks, no telemetry** — pure markdown +
-   native tools
+   native tools (one optional TS plugin for compaction persistence and one
+   optional TS tool for vision fallback; both degrade gracefully when absent)
 4. **Subagent isolation for heavy work** — `webfetch` and large reads happen in
    `explore`/`general` subagents
 5. **Feedback loops** — every downstream command has PASS / FIX_FORWARD / REPLAN
@@ -566,35 +696,57 @@ These rules must not be violated by any command or reference:
 mahou/
 ├── install.ps1
 ├── install.sh
-├── commands/
+├── commands/              ← opencode slash commands (markdown + frontmatter)
 │   ├── mahou.md
 │   ├── mahou-ask.md
 │   ├── mahou-brainstorm.md
 │   ├── mahou-debug.md
+│   ├── mahou-designer.md
 │   ├── mahou-init.md
 │   ├── mahou-new-project.md
 │   ├── mahou-orchestrator.md
+│   ├── mahou-postmortem.md
 │   ├── mahou-research.md
 │   ├── mahou-resume.md
 │   ├── mahou-review.md
+│   ├── mahou-secure.md
 │   ├── mahou-ship.md
+│   ├── mahou-ultracode.md
 │   └── mahou-verify.md
-├── references/
+├── agents/                ← permission-enforced agents (installed to opencode)
+│   ├── ask.md                       # read-only side-chat agent
+│   ├── mahou-readonly.md            # read-only enforcement for review/verify/etc.
+│   ├── mahou-planner.md             # .mahou/-only writes for brainstorm/etc.
+│   ├── implementer.md               # subagent: one task, tests, commit
+│   ├── spec-reviewer.md             # subagent: spec compliance (read-only)
+│   ├── code-quality-reviewer.md     # subagent: code quality (read-only)
+│   ├── integration-reviewer.md      # subagent: seam checks (read-only)
+│   └── issue-verifier.md            # subagent: single-issue verification (read-only)
+├── skills/                ← technique guides (SKILL.md, skill-tool discoverable)
+│   ├── mahou-condition-waiting/
+│   ├── mahou-defense-in-depth/
+│   ├── mahou-design-craft/
+│   ├── mahou-git-workflow/
+│   ├── mahou-receiving-review/
+│   ├── mahou-root-cause-tracing/
+│   ├── mahou-ui-critique/
+│   ├── mahou-ui-design/
+│   ├── mahou-ultracode-patterns/
+│   ├── mahou-verification-completion/
+│   └── mahou-writing/
+├── plugins/
+│   └── mahou-compaction.ts          # injects .mahou/state.json into compaction
+├── tools/
+│   └── describe-image.ts            # auxiliary vision tool (non-vision models)
+├── references/            ← subagent prompt templates + scripts
 │   ├── code-quality-reviewer-prompt.md
-│   ├── condition-based-waiting.md
-│   ├── defense-in-depth.md
 │   ├── find-polluter.sh
-│   ├── git-workflow.md
 │   ├── implementer-prompt.md
 │   ├── integration-reviewer-prompt.md
 │   ├── issue-verifier-prompt.md
 │   ├── research-prompt.md
-│   ├── root-cause-tracing.md
 │   ├── spec-reviewer-prompt.md
-│   ├── ui-critique.md
-│   ├── ui-design.md
-│   ├── verify-prompt.md
-│   └── writing.md
+│   └── verify-prompt.md
 └── README.md
 ```
 

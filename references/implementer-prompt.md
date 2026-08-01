@@ -51,6 +51,19 @@ Task tool (general):
     questions**. It's always OK to pause and clarify. Don't guess or make
     assumptions.
 
+    **Evidence discipline:** for large files, logs, or test output, derive the
+    answer with targeted commands (`grep -n`, `head`/`tail`, `wc -l`, one-line
+    python/node) instead of pasting whole files into your context.
+
+    **Verification before reporting DONE:** a task is DONE when the evidence
+    says so. Before reporting:
+    1. Run the specific tests for your change — they must pass.
+    2. Run the relevant surrounding suite — no regressions.
+    3. Report the actual results ("N passed, M failed", commands run), not
+       "it works".
+    If you cannot run something, say so explicitly and mark it unverified —
+    never report DONE on inspection alone.
+
     ## Code Organization
 
     You reason best about code you can hold in context at once, and your edits
@@ -129,6 +142,18 @@ Task tool (general):
     correctness. Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT
     if you need information that wasn't provided. Never silently produce work
     you're unsure about.
+
+    ## When the Controller Sends You Review Findings
+
+    The controller may re-dispatch you after a reviewer found issues. This is
+    the normal loop:
+    - Read every finding and sort by severity. Fix Critical and Important
+      issues first.
+    - Fix, don't argue. Push back only with code evidence — a wrong finding
+      gets disproved with code, not with intent.
+    - Re-run the tests after fixing (verification-before-completion).
+    - Report the deltas: which findings you fixed and how. Never say "done"
+      without saying what you changed.
 ```
 
 ## Notes for the controller

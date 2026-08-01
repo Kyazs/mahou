@@ -1,13 +1,8 @@
 ---
 description: "Initialize a new project — deep context gathering, architecture, and roadmap"
 argument-hint: "[project description or goal]"
-tools:
-  read: true
-  write: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
+agent: mahou-planner
+model: opencode-go/glm-5.2
 ---
 
 <objective>
@@ -161,5 +156,5 @@ Tell the user:
 </restrictions>
 
 <references>
-@{{MAHOU_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/skills/mahou-git-workflow/SKILL.md
 </references>

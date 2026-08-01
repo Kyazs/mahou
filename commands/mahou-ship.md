@@ -1,11 +1,8 @@
 ---
 description: "Push branch, create PR with auto-generated body, filter .mahou/ artifacts"
 argument-hint: "[spec uuid or feature name from ROADMAP]"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
+agent: mahou-readonly
+model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>
@@ -13,7 +10,16 @@ Ship completed work: push the branch, create a PR with an auto-generated
 body sourced from the spec, plan, state, and verification report. Filter
 .mahou/ planning artifacts from the PR diff so reviewers see only code
 changes.
+
+Runs under the `mahou-readonly` agent: `edit`/`write` are tool-enforced deny;
+git push and destructive bash are tool-enforced deny. PR creation uses `gh`
+via allowed bash.
 </objective>
+
+<current_state>
+Current branch and tree (injected at invocation):
+!`git branch --show-current 2>/dev/null; git status --porcelain 2>/dev/null | head -20`
+</current_state>
 
 <context>
 Target: $ARGUMENTS (spec UUID, feature name from ROADMAP, or empty for
@@ -35,6 +41,10 @@ If verification hasn't passed, tell the user to run /mahou-verify first.
 3. `git rev-parse --abbrev-ref HEAD` — current branch name
 4. `git rev-parse --abbrev-ref @{upstream}` or `git remote` — check remote
    tracking
+5. **Test gate** — run the project's test suite (`npm test` / `pytest` /
+   `go test` / whatever the project uses). If tests fail, STOP and tell the
+   user — do not push a red branch. Route to `/mahou-debug` if they want it
+   fixed first. If there is no suite, note it and proceed.
 
 If there's nothing to ship (clean tree, no commits ahead of remote), tell the
 user and stop.
@@ -151,5 +161,5 @@ Update ROADMAP.md: feature status → `done`.
 </restrictions>
 
 <references>
-@{{MAHOU_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/skills/mahou-git-workflow/SKILL.md
 </references>

@@ -1,12 +1,8 @@
 ---
 description: "Code review of existing scope — discover, triage, verify, report (read-only)"
 argument-hint: "[module, feature, directory, or PR to review]"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
+agent: mahou-readonly
+model: opencode-go/grok-4.5
 ---
 
 <objective>
@@ -14,9 +10,15 @@ Senior software engineer performing a code review on an existing codebase. You
 do NOT fix anything. You find real issues, verify them against the actual code,
 and report only what survives verification.
 
-You are read-only: no `edit` or `write` tools are available. You may ONLY
-observe, analyze, and report. Do NOT use bash to mutate files -- only
-read/inspect (ls, cat, grep, git log, git diff, find, git blame, git show).
+This command runs under the `mahou-readonly` agent: `edit`/`write` are
+tool-enforced deny. Bash may only read/inspect (ls, cat, grep, git log, git
+diff, find, git blame, git show) — mutating and destructive commands are
+tool-enforced deny. A review that mutates the code under review is a critical
+violation — you'd be reviewing a moving target.
+
+**REVIEW is for reviewing existing code with fresh eyes. It is NOT a
+pre-merge gate for your own in-progress work** — for that, use the build
+agent or `/mahou-debug` on specific symptoms.
 </objective>
 
 <context>
@@ -45,10 +47,10 @@ Two phases use subagents:
   (`subagent_type: "explore"`) to map the scope in parallel. Run independent
   questions concurrently. NEVER dispatch general or other mutating subagent
   types during discovery.
-- **Phase 3 (Verification):** dispatch **general** subagents (one per issue)
-  using the template at `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
-  Verifiers are read-only by instruction. Batch multiple verifiers in a single
-  message so they run concurrently.
+- **Phase 3 (Verification):** dispatch the **issue-verifier** subagent
+  (`subagent_type: "issue-verifier"`, one per issue, in parallel) — it is
+  tool-enforced read-only (`edit`/`write` denied) and neutral by design.
+  Batch multiple verifiers in a single message so they run concurrently.
 
 Synthesize what subagents find yourself. Read the actual files. A verifier's
 CONFIRMED/REFUTED verdict must be spot-checked against the real code before it
@@ -68,13 +70,15 @@ reporting without verification (skipping Phase 3) ships false positives.
 2. **Find the relevant files.** Use `glob`, `grep`, directory exploration, and
    `git diff`/`git log` for diff/PR reviews. Dispatch explore subagents for
    broad areas.
-3. **Read each file you find.** Build a mental model. For very large files, read
-   relevant sections.
+3. **Read each file you find.** Build a mental model. For very large files,
+   derive the structure instead of pasting the whole file: `grep -n "^function\|^export"`,
+   `wc -l`, read the relevant sections only. Keep your context for synthesis,
+   not file dumps.
 4. **Identify key responsibilities.** What does this code DO, DEPEND ON, and
    what DEPENDS ON IT?
 1a. **UI detection** — if the scope contains UI surfaces (components, pages,
     styles, templates, HTML/CSS files):
-    @{{MAHOU_HOME}}/references/ui-critique.md
+    @{{MAHOU_HOME}}/skills/mahou-ui-critique/SKILL.md
     Phase 3 will use two-assessment synthesis for UI issues:
       Assessment A: design review (Nielsen heuristics + cognitive load)
       Assessment B: code inspection (interaction states, accessibility, drift)
@@ -121,9 +125,8 @@ If Phase 2 finds no issues, skip to Phase 4: "No issues found in reviewed code."
 For EACH issue, spawn an independent verification subagent:
 
 - Receives ONLY its single issue -- not the full triage list.
-- Dispatched with `subagent_type: "general"` using the template at
-  `{{MAHOU_HOME}}/references/issue-verifier-prompt.md`.
-- Read-only by instruction (template forbids edit/write).
+- Dispatched with `subagent_type: "issue-verifier"`.
+- Tool-enforced read-only (the agent denies `edit`/`write`).
 - Starts neutral, decides based on evidence.
 
 Dispatch verifiers in parallel: batch multiple Task calls in a single message.
@@ -171,9 +174,12 @@ systemic patterns.
   potentially cause issues."
 - **Do NOT speculate beyond what the code actually does.**
 - **No nitpicks.** Style, formatting, naming are out of scope.
+- **Silence is better than noise.** If you can't find a real issue, say
+  nothing rather than manufacturing findings to justify the review.
 - **No fixes.** You report. The user takes confirmed issues to `/mahou-debug`
   (correctness bugs) or the build agent (surgical fixes) or
-  `/mahou-brainstorm` (architecture findings needing design).
+  `/mahou-brainstorm` (architecture findings needing design). UI findings
+  route to `/mahou-designer`.
 </rules>
 
 <red_flags>
@@ -187,5 +193,7 @@ systemic patterns.
 </red_flags>
 
 <verifier_template>
+The issue-verifier subagent (agents/issue-verifier.md) carries its own
+read-only enforcement. Reference prompt template for review:
 @{{MAHOU_HOME}}/references/issue-verifier-prompt.md
 </verifier_template>

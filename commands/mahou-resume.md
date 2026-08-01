@@ -1,10 +1,7 @@
 ---
 description: "Resume work from previous session — state restoration with git-diff reconciliation"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
+agent: mahou-readonly
+model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>
@@ -15,7 +12,14 @@ orchestrator to continue.
 
 This is the session-continuity command. Close opencode mid-orchestration,
 reopen, run /mahou-resume, and you're back where you left off.
+
+Runs under the `mahou-readonly` agent: `edit`/`write` are tool-enforced deny.
 </objective>
+
+<current_state>
+Current orchestration state (injected at invocation):
+!`cat .mahou/state.json 2>/dev/null || echo "NO_STATE_FILE"`
+</current_state>
 
 <process>
 ### Phase 1: Load State
@@ -122,5 +126,5 @@ resumes from there (it doesn't restart from Task 1).
 </restrictions>
 
 <references>
-@{{MAHOU_HOME}}/references/git-workflow.md
+@{{MAHOU_HOME}}/skills/mahou-git-workflow/SKILL.md
 </references>

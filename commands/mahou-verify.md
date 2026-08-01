@@ -1,12 +1,8 @@
 ---
 description: "Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN"
 argument-hint: "[spec uuid or path to spec/plan]"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
+agent: mahou-readonly
+model: opencode-go/grok-4.5
 ---
 
 <objective>
@@ -64,12 +60,18 @@ Each verifier:
 - Reads the implementation code (static verification)
 - Returns: PASS | FAIL | UNCLEAR
 
+**Evidence discipline:** verifiers must derive answers from test output and
+large files with targeted commands (`grep -n`, `head`/`tail`, `wc -l`,
+one-line python/node) rather than pasting whole outputs into their context.
+Verdicts without evidence are UNCLEAR.
+
 ### Phase 3: Synthesize Verdict
 
 Collect all verifier verdicts and synthesize:
 
 - **ALL PASS** → `PASS`
-  - Route to /mahou-ship (or /mahou-secure if security-sensitive)
+  - Route to /mahou-ship (or /mahou-secure if security-sensitive — auth,
+    payments, user data, secrets, network input)
   - Update ROADMAP.md: feature status → `verified`
 
 - **Any FAIL, and the failure is an implementation bug** (spec is correct,
@@ -115,7 +117,8 @@ Generate a UUID and write the verification report to
 
 ## Routing
 
-- [If PASS]: Run /mahou-ship to create PR
+- [If PASS]: Run /mahou-ship to create PR (or /mahou-secure first if
+  security-sensitive)
 - [If FIX_FORWARD]: Run /mahou-debug with: [specific failing criteria]
 - [If REPLAN]: Run /mahou-brainstorm to revise: [spec section]
 
@@ -146,8 +149,9 @@ Present the verdict and routing recommendation to the user.
 </error_handling>
 
 <restrictions>
-- You are read-only: no `edit` or `write` tools for source files. You may
-  ONLY write to `./.mahou/verify/<uuid>.md` and update ROADMAP.md.
+- This command runs under the `mahou-readonly` agent: `edit`/`write` are
+  tool-enforced deny. You may ONLY write to `./.mahou/verify/<uuid>.md` and
+  update ROADMAP.md (via bash).
 - Do NOT fix implementation bugs yourself. Route to /mahou-debug.
 - Do NOT revise the spec yourself. Route to /mahou-brainstorm.
 </restrictions>

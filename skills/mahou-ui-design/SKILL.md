@@ -1,3 +1,8 @@
+---
+name: mahou-ui-design
+description: UI design discovery and spec guidance (slop test, states, registers) — use when brainstorming a feature with a UI
+---
+
 # UI Design Reference
 
 Loaded by /mahou-brainstorm via @-include ONLY when the feature involves a

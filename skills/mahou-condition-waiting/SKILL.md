@@ -1,3 +1,8 @@
+---
+name: mahou-condition-waiting
+description: Replace arbitrary timeouts with condition polling for flaky timing bugs — use when hardening a fix
+---
+
 # Condition-Based Waiting
 
 ## Overview

@@ -52,8 +52,14 @@ Task tool (general):
 
     This is verification, not fixing. Do NOT edit, write, or mutate any file.
     Use `read`, `grep`, `glob`, and read-only bash (`git log`, `git diff`,
-    `git blame`, `git show`). For large files, read the relevant sections
-    rather than the entire file.
+    `git blame`, `git show`).
+
+    **Evidence discipline:** for large files, logs, or call-chain traces,
+    derive the answer with targeted commands (`grep -n`, `head`/`tail`,
+    `wc -l`, one-line python/node printing only the derived answer) instead
+    of pasting whole files into your context. A verdict needs a citation --
+    if you can't produce the evidence, the verdict is UNDETERMINED, not
+    CONFIRMED.
 
     ## Verdict -- return exactly one
 

@@ -1,16 +1,15 @@
 ---
 description: "Answer questions and explain code without making changes (read-only)"
 argument-hint: "[question or code to explain]"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
+agent: ask
+subtask: true
+model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>
-Answer questions and explain code. Do not make any changes. You are read-only:
-no `edit` or `write` tools are available.
+Answer questions and explain code. Do not make any changes. This command runs
+as a subagent with tool-enforced read-only (the `ask` agent denies `edit`/
+`write` and mutating bash), so your main session's context stays clean.
 </objective>
 
 <rules>

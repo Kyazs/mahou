@@ -1,14 +1,8 @@
 ---
 description: "Collaborative brainstorm to spec to implementation plan — design first, get approval"
 argument-hint: "[idea or feature description]"
-tools:
-  read: true
-  write: true
-  edit: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
+agent: mahou-planner
+model: opencode-go/grok-4.5
 ---
 
 <objective>
@@ -19,10 +13,12 @@ approaches, present a design, get approval, write a spec, then write a plan.
 </objective>
 
 <restrictions>
-- The codebase is read-only: never modify existing source files. You may ONLY
-  use `edit`/`write` on spec/plan documents under `./.mahou/specs/` and
-  `./.mahou/plans/` (creating new ones with `write`, or revising existing
-  ones with `edit`), and on `./.mahou/ROADMAP.md` for status updates.
+- This command runs under the `mahou-planner` agent: file writes are
+  tool-enforced to `./.mahou/**` only. The codebase is untouchable — never
+  modify existing source files. You may ONLY use `edit`/`write` on
+  spec/plan documents under `./.mahou/specs/` and `./.mahou/plans/` (creating
+  new ones with `write`, or revising existing ones with `edit`), and on
+  `./.mahou/ROADMAP.md` for status updates.
 - Bash is read-only: do not mutate the filesystem, install packages, push
   commits, or run long-running processes.
 </restrictions>
@@ -57,7 +53,7 @@ Complete in order:
       `git diff`). Understand the architecture before asking anything.
 
 1a. **UI detection** — if the feature involves a user interface:
-    @{{MAHOU_HOME}}/references/ui-design.md
+    @{{MAHOU_HOME}}/skills/mahou-ui-design/SKILL.md
     Add UI discovery questions to step 3:
       - Purpose & context (who specifically, state of mind, success criteria)
       - Content & data (realistic ranges: min/typical/max, edge cases)
@@ -160,5 +156,5 @@ If returning from /mahou-verify with a REPLAN verdict:
 </existing_codebases>
 
 <writing_reference>
-@{{MAHOU_HOME}}/references/writing.md
+@{{MAHOU_HOME}}/skills/mahou-writing/SKILL.md
 </writing_reference>

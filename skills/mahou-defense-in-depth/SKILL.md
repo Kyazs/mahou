@@ -1,3 +1,8 @@
+---
+name: mahou-defense-in-depth
+description: Validate at every layer a bug's bad data passed through — use after finding a root cause to make the bug structurally impossible
+---
+
 # Defense-in-Depth Validation
 
 ## Overview

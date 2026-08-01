@@ -1,3 +1,8 @@
+---
+name: mahou-ui-critique
+description: UI critique methodology (Nielsen heuristics, cognitive load, two-assessment synthesis) — use when reviewing UI code
+---
+
 # UI Critique Reference
 
 Loaded by /mahou-review via @-include ONLY when the review scope contains UI

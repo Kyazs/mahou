@@ -1,3 +1,8 @@
+---
+name: mahou-writing
+description: Write implementation plans and specs with zero-context, bite-sized tasks — use before writing a plan in mahou-brainstorm
+---
+
 # Writing Implementation Plans
 
 This is the writing reference bundled with mahou.

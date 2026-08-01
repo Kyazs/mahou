@@ -1,20 +1,15 @@
 ---
 description: "Internet-connected research — explore, diagnose, or lookup via Yahoo/Bing search"
 argument-hint: "[--explore|--diagnose|--lookup] [research question]"
-tools:
-  read: true
-  bash: true
-  grep: true
-  glob: true
-  agent: true
-  webfetch: true
+model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>
-Internet-connected research using Yahoo/Bing search via the native webfetch
-tool. Three modes serve different research needs. Heavy fetching happens
-inside isolated subagents (for explore/diagnose) to keep main context lean.
-Lookup mode fetches directly (1 page, fast, inline).
+Internet-connected research using the native `websearch` and `webfetch`
+tools (Yahoo/Bing search fallback via webfetch). Three modes serve different
+research needs. Heavy fetching happens inside isolated subagents (for
+explore/diagnose) to keep main context lean. Lookup mode fetches directly
+(1 page, fast, inline).
 </objective>
 
 <context>
@@ -42,7 +37,8 @@ Everything after the flag is the research question.
 3. **Dispatch 3-5 general subagents in parallel**, one per facet. Use the
    template at `{{MAHOU_HOME}}/references/research-prompt.md`. Each
    subagent:
-   - Fetches Yahoo search: `webfetch("https://search.yahoo.com/search?p=<url-encoded-facet>")`
+   - Searches via the native `websearch` tool when available; otherwise
+     fetches Yahoo search: `webfetch("https://search.yahoo.com/search?p=<url-encoded-facet>")`
    - Extracts top result URLs from the search results
    - Fetches top 2-3 result pages via webfetch
    - Returns a distilled brief + cited URLs (NOT raw HTML)
@@ -71,7 +67,8 @@ Everything after the flag is the research question.
 2. **Fetch directly in main context** — no subagent:
    - If the query looks like a URL, fetch it directly:
      `webfetch("<url>")`
-   - Otherwise, fetch a Yahoo search:
+   - Otherwise, use the native `websearch` tool when available; if not,
+     fetch a Yahoo search:
      `webfetch("https://search.yahoo.com/search?p=<url-encoded-query>")`
    - If searching, extract the top result URL and fetch that page.
 3. **Return inline answer** (~100-200 tokens). No file saved.
