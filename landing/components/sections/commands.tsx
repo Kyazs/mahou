@@ -5,24 +5,24 @@ import { ScrollReveal } from "@/components/effects/scroll-reveal";
 
 const commands = [
   {
-    name: "/mahou-brainstorm",
-    description: "Design to spec before writing code.",
-    layer: "Feature",
+    name: "/mahou-new-project",
+    description: "Initialize the project — PROJECT.md and ROADMAP.md.",
+    layer: "Project",
   },
   {
-    name: "/mahou-orchestrator",
-    description: "Execute a plan task-by-task via subagents.",
-    layer: "Feature",
+    name: "/mahou-init",
+    description: "Map an existing codebase into .mahou/map.md.",
+    layer: "Project",
   },
   {
-    name: "/mahou-verify",
-    description: "Check implementation against the spec.",
-    layer: "Lifecycle",
+    name: "/mahou-research",
+    description: "Research online — explore, diagnose, or lookup.",
+    layer: "Project",
   },
   {
-    name: "/mahou-ship",
-    description: "Push, create a PR, filter planning artifacts.",
-    layer: "Lifecycle",
+    name: "/mahou-ask",
+    description: "Answer questions and explain code, never editing.",
+    layer: "Any",
   },
   {
     name: "/mahou-debug",
@@ -33,6 +33,51 @@ const commands = [
     name: "/mahou-review",
     description: "Discover, triage, and verify real issues only.",
     layer: "Any",
+  },
+  {
+    name: "/mahou-brainstorm",
+    description: "Design to spec before writing code.",
+    layer: "Feature",
+  },
+  {
+    name: "/mahou-designer",
+    description: "Design and ship production-grade frontend interfaces.",
+    layer: "Feature",
+  },
+  {
+    name: "/mahou-orchestrator",
+    description: "Execute a plan task-by-task via subagents.",
+    layer: "Feature",
+  },
+  {
+    name: "/mahou-ultracode",
+    description: "Fan out parallel subagent waves for large-scale work.",
+    layer: "Feature",
+  },
+  {
+    name: "/mahou-verify",
+    description: "Check implementation against the spec.",
+    layer: "Lifecycle",
+  },
+  {
+    name: "/mahou-secure",
+    description: "Security-verify a change — PASS, FIX, or ESCALATE.",
+    layer: "Lifecycle",
+  },
+  {
+    name: "/mahou-resume",
+    description: "Resume orchestration with git-diff reconciliation.",
+    layer: "Lifecycle",
+  },
+  {
+    name: "/mahou-ship",
+    description: "Push, create a PR, filter planning artifacts.",
+    layer: "Lifecycle",
+  },
+  {
+    name: "/mahou-postmortem",
+    description: "Write a post-mortem for a resolved incident.",
+    layer: "Lifecycle",
   },
 ];
 

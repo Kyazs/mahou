@@ -1,27 +1,58 @@
 # Deploy the mahou landing page
 
+The landing page is a Next.js app in `landing/`. It is not a static
+`index.html` site.
+
 ## Local preview
 
-Open `index.html` directly in a browser, or serve the folder with any static server:
-
 ```bash
-python -m http.server 8000
+cd landing
+npm install
+npm run dev
 ```
 
-Then visit `http://localhost:8000`.
+Then visit `http://localhost:3000`.
+
+## Production build
+
+```bash
+cd landing
+npm run build
+npm run start
+```
+
+`npm run build` also type-checks and lints the app; fix any errors before
+deploying.
 
 ## GitHub Pages
 
-1. Push these files to the root of your repository branch:
-   - `index.html`
-   - `styles.css`
-   - `script.js`
-   - `CNAME`
-2. Go to **Settings → Pages** in the GitHub repository.
-3. Select **Deploy from a branch**, choose the branch, and select **/(root)**.
-4. Replace `yourdomain.com` in `CNAME` with your actual custom domain before pushing.
-5. Add the required DNS records at your domain registrar.
-6. Wait a few minutes for DNS and HTTPS to propagate.
+The site is intended to be served as a static export from the `landing/`
+directory:
+
+1. Add static export to `landing/next.config.ts`:
+
+   ```ts
+   const nextConfig: NextConfig = {
+     output: "export",
+   };
+   ```
+
+2. Build the export:
+
+   ```bash
+   cd landing
+   npm run build
+   ```
+
+   The static site is written to `landing/out/`.
+
+3. Push the contents of `landing/out/` (plus `CNAME` at the repo root) to
+   the branch that GitHub Pages serves.
+4. Go to **Settings → Pages** in the GitHub repository, select **Deploy from
+   a branch**, and choose the branch and folder.
+5. Replace the value in `CNAME` with your actual custom domain before
+   pushing.
+6. Add the required DNS records at your domain registrar.
 
 ## Custom domain DNS
 
