@@ -2,7 +2,6 @@
 description: "Initialize a new project — deep context gathering, architecture, and roadmap"
 argument-hint: "[project description or goal]"
 agent: mahou-planner
-model: opencode-go/glm-5.2
 ---
 
 <objective>

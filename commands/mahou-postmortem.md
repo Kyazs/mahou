@@ -2,7 +2,6 @@
 description: "Write a post-mortem for a resolved incident — root cause, defense-in-depth, monitoring"
 argument-hint: "[bug or incident description]"
 agent: mahou-planner
-model: opencode-go/deepseek-v4-pro
 ---
 
 <objective>

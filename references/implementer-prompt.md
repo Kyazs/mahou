@@ -165,6 +165,7 @@ Task tool (general):
 - Capture the **BASE_SHA** (current `git rev-parse HEAD`) before dispatching so
   you can pass it to the code quality reviewer along with the implementer's
   reported HEAD_SHA.
-- Pick the model per the orchestrator's model-selection guidance: cheap for
-  mechanical 1-2 file tasks, standard for multi-file integration, most capable
-  for design judgment.
+- Pick the model per the orchestrator's model-selection rule: consult
+  `./.mahou/models.json` (tasks/roles maps) if present, else use the session
+  model. If a different model is needed, ask the user to set it via
+  `/models` before dispatching.

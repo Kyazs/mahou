@@ -2,7 +2,6 @@
 description: "Verify implementation against spec — PASS, FIX_FORWARD, or REPLAN"
 argument-hint: "[spec uuid or path to spec/plan]"
 agent: mahou-readonly
-model: opencode-go/grok-4.5
 ---
 
 <objective>

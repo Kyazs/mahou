@@ -2,7 +2,6 @@
 description: "Security verification of a change before shipping — PASS, FIX, or ESCALATE"
 argument-hint: "[spec uuid, feature name from ROADMAP, or commit range]"
 agent: mahou-readonly
-model: opencode-go/grok-4.5
 ---
 
 <objective>

@@ -2,7 +2,6 @@
 description: "Generate codebase map — module inventory, patterns, entry points (no AGENTS.md)"
 argument-hint: "[directory to map, defaults to current directory]"
 agent: mahou-planner
-model: opencode-go/glm-5.2
 ---
 
 <objective>

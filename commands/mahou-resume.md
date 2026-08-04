@@ -1,7 +1,6 @@
 ---
 description: "Resume work from previous session — state restoration with git-diff reconciliation"
 agent: mahou-readonly
-model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>

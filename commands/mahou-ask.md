@@ -3,7 +3,6 @@ description: "Answer questions and explain code without making changes (read-onl
 argument-hint: "[question or code to explain]"
 agent: ask
 subtask: true
-model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>

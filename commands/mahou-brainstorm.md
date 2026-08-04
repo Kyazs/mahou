@@ -2,7 +2,6 @@
 description: "Collaborative brainstorm to spec to implementation plan — design first, get approval"
 argument-hint: "[idea or feature description]"
 agent: mahou-planner
-model: opencode-go/grok-4.5
 ---
 
 <objective>

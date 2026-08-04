@@ -1,7 +1,6 @@
 ---
 description: "Design and ship production-grade frontend interfaces — slop test, absolute bans, craft bar"
 argument-hint: "[UI task: build, redesign, or critique]"
-model: opencode-go/grok-4.5
 ---
 
 <objective>

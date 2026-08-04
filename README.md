@@ -18,6 +18,7 @@ No plugins, no MCP servers, no npm dependencies. Just markdown command files and
 - [Repository Structure](#repository-structure)
 - [Contributing](#contributing)
 - [License](#license)
+- [Changelog](#changelog)
 
 ## Background
 
@@ -396,9 +397,9 @@ quality review does not start until spec compliance passes.
 `agent`. No `edit` or `write` tools. Subagents handle all writes and commits.
 May write to state.json and ROADMAP.md via bash.
 
-**Model selection:** Cheap/fast models for mechanical tasks (1-2 files, clear
-spec). Standard models for integration tasks (multi-file, pattern matching).
-Most capable models for architecture, design, and review.
+**Model selection:** Uses `./.mahou/models.json` (task/role -> model mapping) if
+present; otherwise the session's model — the opencode default. See "Model
+selection" below.
 
 **Example:**
 
@@ -520,8 +521,8 @@ unless asked to fix).
 critique of websites, landing pages, dashboards, product UI. Not for
 backend-only work.
 
-**Tools & access:** Full (designs AND builds). Model-routed to a most-capable
-model via frontmatter. Loads `mahou-design-craft` skill for the craft and
+**Tools & access:** Full (designs AND builds). Runs on the session's model
+(see "Model selection"). Loads `mahou-design-craft` skill for the craft and
 critique framework.
 
 **Example:**
@@ -589,6 +590,62 @@ codebase stays untouched.
 ```text
 /mahou-postmortem The intermittent auth test failure we just root-caused
 ```
+
+## Model selection (model orchestrator)
+
+Mahou never hardcodes a provider or model ID. Which model a command runs on
+resolves in this order:
+
+1. **Project config** — a repository can set its own default by adding an
+   `opencode.json` in the repo root with `"model": "provider-id/model-id"`.
+   It overrides everything below and is safe to commit.
+2. **Global config** — `~/.config/opencode/opencode.json` `"model"` is the
+   machine-wide default.
+3. **Session** — whatever model the current session uses (set via `/models`
+   or `opencode run --model ...`). With no config, opencode uses its own
+   default.
+
+### `.mahou/models.json` (routing)
+
+For per-role model routing during orchestration, a repository can provide
+`.mahou/models.json` (schema below; a local example lives at
+`.mahou/models.json.example`). It maps task categories and subagent roles to
+model IDs:
+
+```json
+{
+  "default": "provider-id/model-id",
+  "roles": {
+    "implementer": "provider-id/model-id",
+    "spec-reviewer": "provider-id/model-id",
+    "code-quality-reviewer": "provider-id/model-id",
+    "integration-reviewer": "provider-id/model-id"
+  },
+  "tasks": {
+    "mechanical": "provider-id/model-id",
+    "standard": "provider-id/model-id",
+    "capable": "provider-id/model-id"
+  }
+}
+```
+
+- **If `.mahou/models.json` exists**, the orchestrator (`/mahou-orchestrator`)
+  and `/mahou-ultracode` use it to pick models for dispatch and reporting,
+  falling back to its `default` for anything unmapped.
+- **If it does not exist**, mahou falls back to the session's model — the
+  opencode default. Mahou never invents a provider ID.
+- `.mahou/models.json` is machine-specific (provider IDs). The `.mahou/`
+  directory is gitignored in this repo; keep the example local.
+
+### Limitations
+
+OpenCode applies model config at load time. A repo's model choice takes effect
+when opencode starts in that repo (repo `opencode.json`) or when you set it
+with `/models` in a session. Plugins have no config hook, so `.mahou/models.json`
+cannot auto-switch the active model — when it calls for a different model than
+the session is running, the orchestrator asks you to set it via `/models`
+before dispatching subagents. Subagents inherit the dispatcher's model unless
+an agent's config pins one.
 
 ## Workflows
 
@@ -768,3 +825,48 @@ For questions or issues, please open a [GitHub issue](https://github.com/).
 ## License
 
 Share freely. This is a configuration package, not a library.
+
+## Changelog
+
+What changed since the previous mahou (Mahou V1, commit 3139f6a).
+
+### Mahou V2 (current)
+
+**Commands** — 4 new: `/mahou-designer`, `/mahou-ultracode`, `/mahou-secure`,
+`/mahou-postmortem` — 15 workflow commands total plus `/mahou`.
+
+**Agents** — 8 permission-enforced agents: `ask`, `mahou-readonly`,
+`mahou-planner`, `implementer`, `spec-reviewer`, `code-quality-reviewer`,
+`integration-reviewer`, `issue-verifier`. Enforcement moved from command
+frontmatter to agent permission config (opencode ignores `tools:` in command
+frontmatter). Read-only commands route to `mahou-readonly` (`edit: deny`,
+destructive bash denied); planning commands to `mahou-planner` (writes only
+under `.mahou/`).
+
+**Skills** — 11 SKILL.md guides (renamed from the old references/ collection),
+including design-craft, ultracode-patterns, verification-completion,
+receiving-review, condition-waiting, defense-in-depth.
+
+**Plugin & tool** — `mahou-compaction` plugin injects `.mahou/state.json`
+into compaction prompts so orchestration survives context loss; `describe-image`
+tool gives non-vision models a vision fallback via Cloudflare AI Gateway.
+
+**Orchestration discipline** — baseline test gate before any task (red baseline
+=> stop), two-stage review loop (spec compliance then code quality), evidence
+requirements, `<no_root_cause>` reporting in `/mahou-debug`, test gate before
+push in `/mahou-ship`, review "silence is better than noise".
+
+**Model routing** — removed ALL hardcoded provider/model IDs from commands.
+Model selection now resolves: `.mahou/models.json` in the current repository
+(task/role -> model mapping) if present, otherwise the opencode default
+(repo `opencode.json` -> global config -> session model). See "Model
+selection (model orchestrator)" above. The repo ships `.mahou/models.json.example`
+(local only) and never invents a provider ID.
+
+**Installer** — `install.sh` / `install.ps1` rewritten: installs commands/,
+agents/, skills/, plugins/, tools/, references/; cleans up the legacy
+`command/` directory; substitutes `{{MAHOU_HOME}}`.
+
+**Docs** — README rewritten and expanded; landing page (`landing/`) now lists
+all 15 commands with layer tags; `DEPLOY.md` rewritten for the Next.js
+landing app.

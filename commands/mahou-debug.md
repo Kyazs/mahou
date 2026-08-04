@@ -1,7 +1,6 @@
 ---
 description: "Systematic root-cause debugging — root cause before fix, evidence over guessing"
 argument-hint: "[bug description or error message]"
-model: opencode-go/grok-4.5
 ---
 
 <objective>

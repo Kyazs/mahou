@@ -2,7 +2,6 @@
 description: "Execute a plan task-by-task via subagents with two-stage review"
 argument-hint: "[path to plan file, e.g. ./.mahou/plans/<uuid>.md]"
 agent: mahou-readonly
-model: opencode-go/deepseek-v4-pro
 ---
 
 <objective>
@@ -51,8 +50,12 @@ instead. If there's no plan, tell them to run `/mahou-brainstorm` first.
 2. **Read project context (if exists):**
    - `./.mahou/map.md` — codebase memory. Include relevant portions in
      implementer context.
-   - `./.mahou/models.json` — model routing config (maps task categories
-     to model IDs). If present, use it for model selection.
+   - `./.mahou/models.json` — optional model routing config (maps task
+     categories and subagent roles to model IDs; see README "Model
+     selection" for the schema). If present, use it for model selection.
+     If absent, use the session's current model (the opencode default) —
+     never invent a provider ID. If the model you need differs from the
+     session model, ask the user to set it via `/models` before dispatch.
    - `./.mahou/PROJECT.md` — project conventions. Include relevant
      conventions in implementer context.
 3. **Initialize state.** Create or reset `./.mahou/state.json` with:
@@ -89,7 +92,7 @@ instead. If there's no plan, tell them to run `/mahou-brainstorm` first.
      with the full task text pasted into the prompt (the subagent never reads
      the plan file). The implementer agent is tool-enforced full-access for
      writes but denies push/reset/destructive commands. Paste the scene-setting
-     context. Pick the model per complexity.
+      context. Pick the model per the model-selection rule (models.json -> session model).
    - If the implementer asks questions, **answer them** and re-dispatch.
     - Handle the implementer's status (see below).
     - **NEEDS_CONTEXT with external unknown:** If the implementer needs
@@ -131,9 +134,14 @@ instead. If there's no plan, tell them to run `/mahou-brainstorm` first.
 </process>
 
 <model_selection>
-- **Mechanical tasks** (1-2 files, clear spec): cheap/fast model.
-- **Integration tasks** (multi-file, pattern matching): standard model.
-- **Architecture/design/review**: most capable model.
+- If `./.mahou/models.json` exists, use its `tasks` map (mechanical /
+  standard / capable) and `roles` map for dispatch, falling back to its
+  `default` for anything unmapped.
+- If it does not exist, use the session's current model — the opencode
+  default (project `opencode.json`, then global config, then session).
+  Do NOT invent provider or model IDs.
+- If the needed model differs from the session model, ask the user to set
+  it via `/models` before dispatching subagents.
 </model_selection>
 
 <implementer_status>

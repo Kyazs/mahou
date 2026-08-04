@@ -2,7 +2,6 @@
 description: "Code review of existing scope — discover, triage, verify, report (read-only)"
 argument-hint: "[module, feature, directory, or PR to review]"
 agent: mahou-readonly
-model: opencode-go/grok-4.5
 ---
 
 <objective>

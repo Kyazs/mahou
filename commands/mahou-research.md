@@ -1,7 +1,6 @@
 ---
 description: "Internet-connected research — explore, diagnose, or lookup via Yahoo/Bing search"
 argument-hint: "[--explore|--diagnose|--lookup] [research question]"
-model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>

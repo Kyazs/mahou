@@ -2,7 +2,6 @@
 description: "Push branch, create PR with auto-generated body, filter .mahou/ artifacts"
 argument-hint: "[spec uuid or feature name from ROADMAP]"
 agent: mahou-readonly
-model: opencode-go/deepseek-v4-flash
 ---
 
 <objective>

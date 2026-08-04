@@ -1,7 +1,6 @@
 ---
 description: "Max-effort execution via large-scale parallel subagent workflows — audits, migrations, refactors"
 argument-hint: "[task too large for one context window]"
-model: opencode-go/grok-4.5
 ---
 
 <objective>
@@ -76,10 +75,12 @@ Every wave verifies its findings before you report them:
 </verification>
 
 <model_selection>
-- Mechanical item work (per-item audits, simple fixes): cheap/fast model.
-- Synthesis, verification, merge steps: most capable model.
-- You (the controller) do the coordination: keep your context lean by moving
-  heavy content into subagent briefs.
+- If `./.mahou/models.json` exists, use its `tasks` map (mechanical /
+  standard / capable) for each phase, falling back to its `default`.
+- Otherwise use the session's current model — the opencode default. Do NOT
+  invent provider or model IDs.
+- If the needed model differs from the session model, ask the user to set
+  it via `/models`.
 </model_selection>
 
 <red_flags>
